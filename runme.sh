@@ -5,6 +5,11 @@
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # ─────────────────────────────────────────────────
 
+##
+## This list of YouTube videos is from searching for "live" "webcam" and "Vancouver"
+## and "Canada" in YouTube. Then searching though the list to see ones that showed 
+## parts of the sky
+## 
 
 # Deep Cove, Vancouver Canada Webcam
 # https://www.youtube.com/watch?v=T0oUufecXeE

@@ -350,5 +350,45 @@
       "g": 4,
       "b": 6
     }
+  },
+  {
+    "file": "s2rzmSNpyns-20250429_1451.png",
+    "average": {
+      "r": 25,
+      "g": 25,
+      "b": 25
+    }
+  },
+  {
+    "file": "s2rzmSNpyns-20250429_1456.png",
+    "average": {
+      "r": 25,
+      "g": 25,
+      "b": 25
+    }
+  },
+  {
+    "file": "s2rzmSNpyns-20250429_1501.png",
+    "average": {
+      "r": 9,
+      "g": 14,
+      "b": 17
+    }
+  },
+  {
+    "file": "s2rzmSNpyns-20250429_1528.png",
+    "average": {
+      "r": 27,
+      "g": 27,
+      "b": 27
+    }
+  },
+  {
+    "file": "s2rzmSNpyns-20250429_1536.png",
+    "average": {
+      "r": 26,
+      "g": 26,
+      "b": 26
+    }
   }
 ]

@@ -18,7 +18,7 @@ if [ "$#" -ne 1 ]; then
 fi
 
 STREAM_ID="$1"
-OUTPUT_DIR="${SCRIPT_DIR}/${STREAM_ID}"
+OUTPUT_DIR="${SCRIPT_DIR}/images/${STREAM_ID}"
 
 # 1. Create the output folder if it doesn't exist
 mkdir -p "$OUTPUT_DIR"
