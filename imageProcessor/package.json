@@ -1,0 +1,31 @@
+{
+  "name": "imageprocessor",
+  "version": "1.0.0",
+  "main": "src/index.ts",
+  "scripts": {
+    "run": "tsc && npm run start",
+    "start": "node dist/index.js --file ../-zgjmZ_nZLI/-zgjmZ_nZLI-20250429_0722.png -x 0 -y 0 --width 1800 --height 328",
+    "start2": "node dist/index.js --settings settings.json",
+    "build": "npm run build:0_bundle && npm run build:1_GenerateSeaConfig && npm run build:2_GenerateBlob && npm run build:3_CopyNodeExecutable && npm run build:4_RemoveSignature && npm run build:5_InjectBlob",
+    "build:0_bundle": "esbuild app.js --bundle --platform=node --outfile=bundle.js",
+    "build:1_GenerateSeaConfig": "node --experimental-sea-config sea-config.json",
+    "build:2_GenerateBlob": "node --experimental-sea-config sea-config.json",
+    "build:3_CopyNodeExecutable": "node -e \"require('fs').copyFileSync(process.execPath, 'app.exe')\"",
+    "build:4_RemoveSignature": "signtool remove /s app.exe",
+    "build:5_InjectBlob": "npx postject app.exe NODE_SEA_BLOB sea-prep.blob --sentinel-fuse NODE_SEA_FUSE_fce680ab2cc467b6e072b8b5df1996b2"    
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "sharp": "^0.31.0",
+    "yargs": "^17.7.1"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.2",
+    "@types/node": "^20.4.2",
+    "@types/yargs": "^17.0.15",
+    "typescript": "^5.1.6"
+  }
+}
