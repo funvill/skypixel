@@ -2,7 +2,7 @@
 
 This script takes a still image from a series of webcam from around the world. Then processes the images and finds the average color of the sky and logs the RGB values to a file.
 
-The index.html shows the color for each image.
+The <a href='https://htmlpreview.github.io/?https://github.com/funvill/skypixel/blob/main/index.html'>index.html</a> shows the color for each image.
 
 ## Notes
 
