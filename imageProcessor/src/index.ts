@@ -5,6 +5,8 @@ import sharp from 'sharp';
 import fs from 'fs/promises';
 import path from 'path';
 
+const VERSION = 'v1 (2025-Apr-30)';
+
 interface Region {
   x: number;
   y: number;
@@ -72,7 +74,7 @@ async function saveSvgBlocks(
   results: { file: string; average: Record<string, number> }[]
 ): Promise<void> {
   const blockSize = 10;
-  const columns = (24*2);
+  const columns = (24 * 2);
   const rows = Math.ceil(results.length / columns);
   const width = columns * blockSize;
   const height = rows * blockSize;
@@ -85,7 +87,7 @@ async function saveSvgBlocks(
     const x = col * blockSize;
     const y = row * blockSize;
     const fill = a !== undefined
-      ? `rgba(${r},${g},${b},${(a/255).toFixed(2)})`
+      ? `rgba(${r},${g},${b},${(a / 255).toFixed(2)})`
       : `rgb(${r},${g},${b})`;
     svg += `<rect x="${x}" y="${y}" width="${blockSize}" height="${blockSize}" fill="${fill}"/>`;
   });
@@ -121,7 +123,7 @@ async function processBatch(settingsPath: string) {
       };
 
       const files = await fs.readdir(folder);
-      const pngs = files.filter(f => 
+      const pngs = files.filter(f =>
         /\.png$/i.test(f) && !/^sky_/i.test(f)
       );
 
@@ -132,24 +134,49 @@ async function processBatch(settingsPath: string) {
       await fs.writeFile(outJson, JSON.stringify([], null, 2));
 
       for (const fname of pngs) {
-        const filePath = path.join(folder, fname);
-        await saveRegionPreview(filePath, region);
-        const avg = await computeAverage(filePath, region);
-        results.push({ file: fname, average: avg });
-        await fs.writeFile(outJson, JSON.stringify(results, null, 2));
+        try {
+          const filePath = path.join(folder, fname);
+          const avg = await computeAverage(filePath, region);
+          results.push({ file: fname, average: avg });         
+          
+          // Write a "." to indicate progress
+          process.stdout.write('.');
+
+          // Debug. Save the region preview for each image. This helps to see if 
+          // the region that is being contains any non sky pixels.
+          await saveRegionPreview(filePath, region);
+        } catch (err) {
+          console.error(`Error processing ${fname}:`, err);
+          // Continue processing other files even if one fails
+          continue;
+        }
       }
+
+      await fs.writeFile(outJson, JSON.stringify(results, null, 2));
 
       // Generate SVG blocks after processing all images
       await saveSvgBlocks(folder, results);
-      console.log(`Wrote ${results.length} items to ${outJson} and generated output.svg`);
+      console.log(`\nWrote ${results.length} items to ${outJson} and generated output.svg`);
     }
   } catch (err) {
-    console.error('Error processing batch:', err);
+    console.error('\nError processing batch:', err);
     process.exit(1);
   }
 }
 
+function printVersion() {
+  console.log(`
+SkyPixel Image processing
+https://github.com/funvill/skypixel
+Version: ${VERSION}
+`);
+}
+
+
 async function main() {
+
+  printVersion();
+
   const argv = yargs(hideBin(process.argv))
     .option('file', { type: 'string', describe: 'Path to PNG file' })
     .option('x', { type: 'number', describe: 'X coordinate' })

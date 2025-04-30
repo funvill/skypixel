@@ -9,6 +9,7 @@ const helpers_1 = require("yargs/helpers");
 const sharp_1 = __importDefault(require("sharp"));
 const promises_1 = __importDefault(require("fs/promises"));
 const path_1 = __importDefault(require("path"));
+const VERSION = 'v1 (2025-Apr-30)';
 /**
  * Extracts the region from the source image and saves a preview prefixed with 'sky_'.
  */
@@ -94,23 +95,42 @@ async function processBatch(settingsPath) {
             const outJson = path_1.default.join(folder, 'output.json');
             await promises_1.default.writeFile(outJson, JSON.stringify([], null, 2));
             for (const fname of pngs) {
-                const filePath = path_1.default.join(folder, fname);
-                await saveRegionPreview(filePath, region);
-                const avg = await computeAverage(filePath, region);
-                results.push({ file: fname, average: avg });
-                await promises_1.default.writeFile(outJson, JSON.stringify(results, null, 2));
+                try {
+                    const filePath = path_1.default.join(folder, fname);
+                    const avg = await computeAverage(filePath, region);
+                    results.push({ file: fname, average: avg });
+                    // Write a "." to indicate progress
+                    process.stdout.write('.');
+                    // Debug. Save the region preview for each image. This helps to see if 
+                    // the region that is being contains any non sky pixels.
+                    await saveRegionPreview(filePath, region);
+                }
+                catch (err) {
+                    console.error(`Error processing ${fname}:`, err);
+                    // Continue processing other files even if one fails
+                    continue;
+                }
             }
+            await promises_1.default.writeFile(outJson, JSON.stringify(results, null, 2));
             // Generate SVG blocks after processing all images
             await saveSvgBlocks(folder, results);
-            console.log(`Wrote ${results.length} items to ${outJson} and generated output.svg`);
+            console.log(`\nWrote ${results.length} items to ${outJson} and generated output.svg`);
         }
     }
     catch (err) {
-        console.error('Error processing batch:', err);
+        console.error('\nError processing batch:', err);
         process.exit(1);
     }
 }
+function printVersion() {
+    console.log(`
+SkyPixel Image processing
+https://github.com/funvill/skypixel
+Version: ${VERSION}
+`);
+}
 async function main() {
+    printVersion();
     const argv = (0, yargs_1.default)((0, helpers_1.hideBin)(process.argv))
         .option('file', { type: 'string', describe: 'Path to PNG file' })
         .option('x', { type: 'number', describe: 'X coordinate' })

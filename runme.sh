@@ -95,3 +95,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # Cape Town - South Africa
 # https://www.youtube.com/watch?v=-zgjmZ_nZLI
 "${SCRIPT_DIR}/capture_frame.sh" -zgjmZ_nZLI
+
+# Process the images 
+# cd "${SCRIPT_DIR}/imageProcessor/"
+# npm run start2
