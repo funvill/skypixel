@@ -34,4 +34,4 @@ ffmpeg -y \
   -ss 00:00:05 \
   -i "$STREAM_URL" \
   -frames:v 1 \
-  "${OUTPUT_DIR}/${STREAM_ID}-${TIMESTAMP}.png"
+  "${OUTPUT_DIR}/${TIMESTAMP}.png"

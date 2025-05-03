@@ -9,156 +9,162 @@ const helpers_1 = require("yargs/helpers");
 const sharp_1 = __importDefault(require("sharp"));
 const promises_1 = __importDefault(require("fs/promises"));
 const path_1 = __importDefault(require("path"));
-const VERSION = 'v1 (2025-Apr-30)';
+const VERSION = 'v2 (2025-May-02)';
+function printVersion() {
+    console.log(`SkyPixel CLI \nVersion: ${VERSION}\n`);
+}
 /**
- * Extracts the region from the source image and saves a preview prefixed with 'sky_'.
+ * Extracts a sky region and saves to 'sky_' prefixed file.
  */
 async function saveRegionPreview(filePath, region) {
     const dir = path_1.default.dirname(filePath);
     const base = path_1.default.basename(filePath);
-    const previewName = `sky_${base}`;
-    const previewPath = path_1.default.join(dir, previewName);
+    const outName = `sky_${base}`;
     await (0, sharp_1.default)(filePath)
         .extract({ left: region.x, top: region.y, width: region.width, height: region.height })
-        .toFile(previewPath);
+        .toFile(path_1.default.join(dir, outName));
 }
 /**
- * Computes the average color of a region from the source image.
+ * Deletes a file if it exists.
  */
-async function computeAverage(file, region) {
-    const { data, info } = await (0, sharp_1.default)(file)
-        .extract({ left: region.x, top: region.y, width: region.width, height: region.height })
+async function deleteFile(filePath) {
+    try {
+        await promises_1.default.unlink(filePath);
+    }
+    catch { }
+    ;
+}
+/**
+ * Computes average color of the entire image file.
+ */
+async function computeAverage(filePath) {
+    const { data, info } = await (0, sharp_1.default)(filePath)
         .raw()
         .toBuffer({ resolveWithObject: true });
-    const pixelCount = region.width * region.height;
+    const pixelCount = info.width * info.height;
     const sums = new Array(info.channels).fill(0);
     for (let i = 0; i < data.length; i += info.channels) {
-        for (let c = 0; c < info.channels; c++)
+        for (let c = 0; c < info.channels; c++) {
             sums[c] += data[i + c];
+        }
     }
     const avg = sums.map(sum => Math.round(sum / pixelCount));
     const [r, g, b, a] = avg;
-    return info.channels === 4 ? { r, g, b, a } : { r, g, b };
+    return info.channels === 4
+        ? { r, g, b, a }
+        : { r, g, b };
 }
 /**
- * Generates an SVG of 10x10px blocks for each average color and writes it.
+ * Saves an SVG palette of 10×10px blocks for each color.
  */
 async function saveSvgBlocks(folder, results) {
-    const blockSize = 10;
-    const columns = (24 * 2);
-    const rows = Math.ceil(results.length / columns);
-    const width = columns * blockSize;
-    const height = rows * blockSize;
-    let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">`;
-    results.forEach((entry, idx) => {
-        const { r, g, b, a } = entry.average;
-        const col = idx % columns;
-        const row = Math.floor(idx / columns);
-        const x = col * blockSize;
-        const y = row * blockSize;
-        const fill = a !== undefined
-            ? `rgba(${r},${g},${b},${(a / 255).toFixed(2)})`
-            : `rgb(${r},${g},${b})`;
-        svg += `<rect x="${x}" y="${y}" width="${blockSize}" height="${blockSize}" fill="${fill}"/>`;
+    const block = 10;
+    const cols = Math.min(10, results.length);
+    const rows = Math.ceil(results.length / cols);
+    const svgParts = [`<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"${cols * block}\" height=\"${rows * block}\">`];
+    results.forEach((r, i) => {
+        const { r: R, g, b, a } = r.average;
+        const x = (i % cols) * block;
+        const y = Math.floor(i / cols) * block;
+        const fill = (a !== undefined)
+            ? `rgba(${R},${g},${b},${(a / 255).toFixed(2)})`
+            : `rgb(${R},${g},${b})`;
+        svgParts.push(`<rect x=\"${x}\" y=\"${y}\" width=\"${block}\" height=\"${block}\" fill=\"${fill}\"/>`);
     });
-    svg += `</svg>`;
-    const svgPath = path_1.default.join(folder, 'output.svg');
-    await promises_1.default.writeFile(svgPath, svg);
+    svgParts.push('</svg>');
+    await promises_1.default.writeFile(path_1.default.join(folder, 'output.svg'), svgParts.join(''));
 }
-async function processSingle(file, region) {
-    try {
-        await saveRegionPreview(file, region);
-        const avg = await computeAverage(file, region);
-        console.log(`Average color for ${file}:`, avg);
-    }
-    catch (err) {
-        console.error(`Error processing ${file}:`, err);
-        process.exit(1);
-    }
+// EXTRACT commands
+async function extractSingle(file, region) {
+    console.log(`Extracting single file: ${file}`);
+    await saveRegionPreview(file, region);
+    await deleteFile(file);
+    console.log(`Extracted sky and removed original: ${file}`);
 }
-async function processBatch(settingsPath) {
-    try {
-        const content = await promises_1.default.readFile(settingsPath, 'utf-8');
-        const entries = JSON.parse(content);
-        for (const entry of entries) {
-            const folder = entry.folder;
-            const region = {
-                x: Number(entry.x),
-                y: Number(entry.y),
-                width: Number(entry.width),
-                height: Number(entry.height)
-            };
-            const files = await promises_1.default.readdir(folder);
-            const pngs = files.filter(f => /\.png$/i.test(f) && !/^sky_/i.test(f));
-            console.log(`Processing ${pngs.length} images in ${folder}`);
-            const results = [];
-            const outJson = path_1.default.join(folder, 'output.json');
-            await promises_1.default.writeFile(outJson, JSON.stringify([], null, 2));
-            for (const fname of pngs) {
-                try {
-                    const filePath = path_1.default.join(folder, fname);
-                    const avg = await computeAverage(filePath, region);
-                    results.push({ file: fname, average: avg });
-                    // Write a "." to indicate progress
-                    process.stdout.write('.');
-                    // Debug. Save the region preview for each image. This helps to see if 
-                    // the region that is being contains any non sky pixels.
-                    await saveRegionPreview(filePath, region);
-                }
-                catch (err) {
-                    console.error(`Error processing ${fname}:`, err);
-                    // Continue processing other files even if one fails
-                    continue;
-                }
-            }
-            await promises_1.default.writeFile(outJson, JSON.stringify(results, null, 2));
-            // Generate SVG blocks after processing all images
-            await saveSvgBlocks(folder, results);
-            console.log(`\nWrote ${results.length} items to ${outJson} and generated output.svg`);
+async function extractBatch(settings) {
+    console.log(`Action: Extracting batch`);
+    const entries = JSON.parse(await promises_1.default.readFile(settings, 'utf-8'));
+    for (const e of entries) {
+        const region = { x: +e.x, y: +e.y, width: +e.width, height: +e.height };
+        const files = await promises_1.default.readdir(e.folder);
+        console.log(`🔎 Processing folder: ${e.folder}`);
+        // Filter out non-PNG files and those starting with 'sky_'
+        const pngFiles = files.filter(f => /\.png$/i.test(f) && !/^sky_/i.test(f));
+        if (pngFiles.length === 0) {
+            console.log(`   ❗ WARN: No files to proccess in folder ${e.folder}`);
+            continue;
         }
-    }
-    catch (err) {
-        console.error('\nError processing batch:', err);
-        process.exit(1);
+        console.log(`   🖼️  Files to processing ${pngFiles.length} files`);
+        for (const f of pngFiles) {
+            const fp = path_1.default.join(e.folder, f);
+            try {
+                await saveRegionPreview(fp, region);
+                await deleteFile(fp);
+                process.stdout.write('.');
+            }
+            catch (err) {
+                console.error(`\n❌ Error extracting ${fp}:`, err);
+            }
+        }
+        console.log(`\n✅ Done extract for folder: ${e.folder}`);
     }
 }
-function printVersion() {
-    console.log(`
-SkyPixel Image processing
-https://github.com/funvill/skypixel
-Version: ${VERSION}
-`);
+// ANALYZE commands
+async function analyzeBatch(settings) {
+    const entries = JSON.parse(await promises_1.default.readFile(settings, 'utf-8'));
+    console.log(`Action: 🔎 Analyzing batch with ${entries.length} folders`);
+    for (const e of entries) {
+        const folder = e.folder;
+        const files = await promises_1.default.readdir(folder);
+        const skies = files.filter(f => /^sky_.*\.png$/i.test(f));
+        const results = [];
+        console.log(`🔎 Processing folder: ${folder}, ${skies.length} files`);
+        for (const f of skies) {
+            try {
+                const avg = await computeAverage(path_1.default.join(folder, f));
+                results.push({ file: f, average: avg });
+                process.stdout.write('+');
+            }
+            catch (err) {
+                console.error(`\n❌ Error analyzing ${f}:`, err);
+            }
+        }
+        await promises_1.default.writeFile(path_1.default.join(folder, 'output.json'), JSON.stringify(results, null, 2));
+        await saveSvgBlocks(folder, results);
+        console.log(`\n✅ Wrote ${results.length} records and output.svg for ${folder}`);
+    }
 }
-async function main() {
+function main() {
+    // CLI setup
     printVersion();
-    const argv = (0, yargs_1.default)((0, helpers_1.hideBin)(process.argv))
-        .option('file', { type: 'string', describe: 'Path to PNG file' })
+    (0, yargs_1.default)((0, helpers_1.hideBin)(process.argv))
+        .command('extract', 'Extract sky regions and delete originals', yargs => yargs
+        .option('file', { type: 'string', describe: 'Single PNG file to extract' })
         .option('x', { type: 'number', describe: 'X coordinate' })
         .option('y', { type: 'number', describe: 'Y coordinate' })
         .option('width', { type: 'number', describe: 'Region width' })
         .option('height', { type: 'number', describe: 'Region height' })
-        .option('settings', { type: 'string', describe: 'Path to settings JSON file for batch processing' })
-        .check(args => {
-        if (args.settings)
+        .option('settings', { type: 'string', describe: 'Path to settings JSON' })
+        .check(argv => {
+        if (argv.settings)
             return true;
-        const needed = ['file', 'x', 'y', 'width', 'height'];
-        for (const opt of needed) {
-            if (args[opt] === undefined)
-                throw new Error(`--${opt} is required in single-file mode`);
+        for (const opt of ['file', 'x', 'y', 'width', 'height']) {
+            if (argv[opt] === undefined)
+                throw new Error(`--${opt} required`);
         }
         return true;
+    }), async (argv) => {
+        if (argv.settings)
+            await extractBatch(argv.settings);
+        else
+            await extractSingle(argv.file, { x: argv.x, y: argv.y, width: argv.width, height: argv.height });
     })
-        .parseSync();
-    if ('settings' in argv && argv.settings) {
-        await processBatch(argv.settings);
-    }
-    else {
-        await processSingle(argv.file, {
-            x: argv.x,
-            y: argv.y,
-            width: argv.width,
-            height: argv.height
-        });
-    }
+        .command('analyze', 'Compute averages and update outputs', yargs => yargs.option('settings', { type: 'string', demandOption: true, describe: 'Path to settings JSON' }), async (argv) => {
+        await analyzeBatch(argv.settings);
+    })
+        .demandCommand(1)
+        .help()
+        .parse();
 }
 main();
+// End of file
