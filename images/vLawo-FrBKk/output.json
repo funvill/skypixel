@@ -1,5 +1,69 @@
 [
   {
+    "file": "sky_20250502_1635.png",
+    "average": {
+      "r": 105,
+      "g": 130,
+      "b": 186
+    }
+  },
+  {
+    "file": "sky_20250502_1640.png",
+    "average": {
+      "r": 102,
+      "g": 128,
+      "b": 185
+    }
+  },
+  {
+    "file": "sky_20250502_1645.png",
+    "average": {
+      "r": 153,
+      "g": 172,
+      "b": 220
+    }
+  },
+  {
+    "file": "sky_20250502_1650.png",
+    "average": {
+      "r": 110,
+      "g": 133,
+      "b": 185
+    }
+  },
+  {
+    "file": "sky_20250502_1655.png",
+    "average": {
+      "r": 122,
+      "g": 141,
+      "b": 185
+    }
+  },
+  {
+    "file": "sky_20250502_1700.png",
+    "average": {
+      "r": 110,
+      "g": 130,
+      "b": 176
+    }
+  },
+  {
+    "file": "sky_20250502_1705.png",
+    "average": {
+      "r": 106,
+      "g": 127,
+      "b": 173
+    }
+  },
+  {
+    "file": "sky_20250502_1710.png",
+    "average": {
+      "r": 106,
+      "g": 128,
+      "b": 175
+    }
+  },
+  {
     "file": "sky_vLawo-FrBKk-20250429_0721.png",
     "average": {
       "r": 231,
@@ -7221,6 +7285,142 @@
       "r": 83,
       "g": 117,
       "b": 187
+    }
+  },
+  {
+    "file": "sky_vLawo-FrBKk-20250502_1505.png",
+    "average": {
+      "r": 83,
+      "g": 117,
+      "b": 187
+    }
+  },
+  {
+    "file": "sky_vLawo-FrBKk-20250502_1510.png",
+    "average": {
+      "r": 83,
+      "g": 117,
+      "b": 188
+    }
+  },
+  {
+    "file": "sky_vLawo-FrBKk-20250502_1515.png",
+    "average": {
+      "r": 82,
+      "g": 118,
+      "b": 190
+    }
+  },
+  {
+    "file": "sky_vLawo-FrBKk-20250502_1525.png",
+    "average": {
+      "r": 82,
+      "g": 118,
+      "b": 191
+    }
+  },
+  {
+    "file": "sky_vLawo-FrBKk-20250502_1530.png",
+    "average": {
+      "r": 81,
+      "g": 118,
+      "b": 192
+    }
+  },
+  {
+    "file": "sky_vLawo-FrBKk-20250502_1535.png",
+    "average": {
+      "r": 81,
+      "g": 118,
+      "b": 192
+    }
+  },
+  {
+    "file": "sky_vLawo-FrBKk-20250502_1540.png",
+    "average": {
+      "r": 83,
+      "g": 118,
+      "b": 192
+    }
+  },
+  {
+    "file": "sky_vLawo-FrBKk-20250502_1545.png",
+    "average": {
+      "r": 83,
+      "g": 119,
+      "b": 194
+    }
+  },
+  {
+    "file": "sky_vLawo-FrBKk-20250502_1550.png",
+    "average": {
+      "r": 84,
+      "g": 119,
+      "b": 193
+    }
+  },
+  {
+    "file": "sky_vLawo-FrBKk-20250502_1555.png",
+    "average": {
+      "r": 84,
+      "g": 119,
+      "b": 193
+    }
+  },
+  {
+    "file": "sky_vLawo-FrBKk-20250502_1600.png",
+    "average": {
+      "r": 85,
+      "g": 120,
+      "b": 194
+    }
+  },
+  {
+    "file": "sky_vLawo-FrBKk-20250502_1605.png",
+    "average": {
+      "r": 85,
+      "g": 120,
+      "b": 194
+    }
+  },
+  {
+    "file": "sky_vLawo-FrBKk-20250502_1610.png",
+    "average": {
+      "r": 89,
+      "g": 122,
+      "b": 191
+    }
+  },
+  {
+    "file": "sky_vLawo-FrBKk-20250502_1615.png",
+    "average": {
+      "r": 113,
+      "g": 132,
+      "b": 180
+    }
+  },
+  {
+    "file": "sky_vLawo-FrBKk-20250502_1620.png",
+    "average": {
+      "r": 117,
+      "g": 135,
+      "b": 182
+    }
+  },
+  {
+    "file": "sky_vLawo-FrBKk-20250502_1625.png",
+    "average": {
+      "r": 103,
+      "g": 128,
+      "b": 184
+    }
+  },
+  {
+    "file": "sky_vLawo-FrBKk-20250502_1630.png",
+    "average": {
+      "r": 102,
+      "g": 129,
+      "b": 186
     }
   }
 ]

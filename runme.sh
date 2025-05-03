@@ -3,13 +3,15 @@
 # ─────────────────────────────────────────────────
 # Resolve the script’s directory (handles symlinks too)
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-# ─────────────────────────────────────────────────
 
 # Build a timestamp
 TIMESTAMP=$(date +"%Y%m%d_%H%M")
 
 # Build the output directory
 OUTPUT_DIR="${SCRIPT_DIR}/images"
+# ─────────────────────────────────────────────────
+
+
 
 ## CURL webcams
 ## 
@@ -221,6 +223,6 @@ curl https://metcam.navcanada.ca/dawc_images/wxcam/CYEK/CYEK_N-full-e.jpeg --out
 
 # ------------------------------------------------------------------------
 
-# Process the images 
+# Extract the sky parts of the image and delete the original file to save space
 cd "${SCRIPT_DIR}/imageProcessor/"
 npm run extract

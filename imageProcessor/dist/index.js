@@ -9,7 +9,7 @@ const helpers_1 = require("yargs/helpers");
 const sharp_1 = __importDefault(require("sharp"));
 const promises_1 = __importDefault(require("fs/promises"));
 const path_1 = __importDefault(require("path"));
-const VERSION = 'v2 (2025-May-02)';
+const VERSION = 'v2.1 (2025-May-02)';
 function printVersion() {
     console.log(`SkyPixel CLI \nVersion: ${VERSION}\n`);
 }
@@ -85,17 +85,32 @@ async function extractBatch(settings) {
     console.log(`Action: Extracting batch`);
     const entries = JSON.parse(await promises_1.default.readFile(settings, 'utf-8'));
     for (const e of entries) {
-        const region = { x: +e.x, y: +e.y, width: +e.width, height: +e.height };
+        let region = { x: +e.x, y: +e.y, width: +e.width, height: +e.height };
         const files = await promises_1.default.readdir(e.folder);
         console.log(`🔎 Processing folder: ${e.folder}`);
-        // Filter out non-PNG files and those starting with 'sky_'
-        const pngFiles = files.filter(f => /\.png$/i.test(f) && !/^sky_/i.test(f));
-        if (pngFiles.length === 0) {
-            console.log(`   ❗ WARN: No files to proccess in folder ${e.folder}`);
+        // Filter out non-PNG/JPG files and those starting with 'sky_'
+        const imageFiles = files.filter(f => /\.(png|jpe?g)$/i.test(f) && !/^sky_/i.test(f));
+        if (imageFiles.length === 0) {
+            console.log(`   ❗ WARN: No files to process in folder ${e.folder}`);
             continue;
         }
-        console.log(`   🖼️  Files to processing ${pngFiles.length} files`);
-        for (const f of pngFiles) {
+        console.log(`   🖼️  Files to process: ${imageFiles.length}`);
+        // Check to see if there is a settings.json file in the folder
+        // If there is then use that instead of the passed in settings
+        const settingsFile = path_1.default.join(e.folder, 'settings.json');
+        if (await promises_1.default.stat(settingsFile).then(() => true).catch(() => false)) {
+            const settingsData = JSON.parse(await promises_1.default.readFile(settingsFile, 'utf-8'));
+            if (settingsData.x !== undefined)
+                region.x = +settingsData.x;
+            if (settingsData.y !== undefined)
+                region.y = +settingsData.y;
+            if (settingsData.width !== undefined)
+                region.width = +settingsData.width;
+            if (settingsData.height !== undefined)
+                region.height = +settingsData.height;
+            console.log(`   ⚙️  Using settings from ${e.folder}/${settingsFile}: ${JSON.stringify(region)}`);
+        }
+        for (const f of imageFiles) {
             const fp = path_1.default.join(e.folder, f);
             try {
                 await saveRegionPreview(fp, region);
@@ -108,6 +123,7 @@ async function extractBatch(settings) {
         }
         console.log(`\n✅ Done extract for folder: ${e.folder}`);
     }
+    console.log(`\n✅ All done!`);
 }
 // ANALYZE commands
 async function analyzeBatch(settings) {
@@ -116,7 +132,8 @@ async function analyzeBatch(settings) {
     for (const e of entries) {
         const folder = e.folder;
         const files = await promises_1.default.readdir(folder);
-        const skies = files.filter(f => /^sky_.*\.png$/i.test(f));
+        // Include sky_ prefixes for PNG/JPG
+        const skies = files.filter(f => /^sky_.*\.(png|jpe?g)$/i.test(f));
         const results = [];
         console.log(`🔎 Processing folder: ${folder}, ${skies.length} files`);
         for (const f of skies) {
@@ -139,7 +156,7 @@ function main() {
     printVersion();
     (0, yargs_1.default)((0, helpers_1.hideBin)(process.argv))
         .command('extract', 'Extract sky regions and delete originals', yargs => yargs
-        .option('file', { type: 'string', describe: 'Single PNG file to extract' })
+        .option('file', { type: 'string', describe: 'Single image file to extract (PNG/JPG)' })
         .option('x', { type: 'number', describe: 'X coordinate' })
         .option('y', { type: 'number', describe: 'Y coordinate' })
         .option('width', { type: 'number', describe: 'Region width' })
