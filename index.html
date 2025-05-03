@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>Average Color Viewer</title>
+  <title>Skypixel - Average Color Viewer</title>
   <style>
     body {
       margin: 0;
@@ -38,61 +38,104 @@
   <h1>SkyPixels</h1>
   <p>See the <a href='https://github.com/funvill/skypixel'>Skypixel</a> project page for more information</p>
 
-
   <script>
-    // Inline settings: array of { title, path }
-    const settings = [
-
-      { title: "English Bay Vancouver <i><a href='https://www.youtube.com/watch?v=Fq-P0bdelRs'>Fq-P0bdelRs</a></i>", path: "./images/Fq-P0bdelRs/output.json" },
-      { title: "Departure Bay <i><a href='https://www.youtube.com/watch?v=2G7bdqbL1EU'>2G7bdqbL1EU</a></i>", path: "./images/2G7bdqbL1EU/output.json" },
-      { title: "White Rock, Canada <i><a href='https://www.youtube.com/watch?v=4MK3E9EWDSY'>4MK3E9EWDSY</a></i>", path: "./images/4MK3E9EWDSY/output.json" },
-      { title: "White Rock, Canada <i><a href='https://www.youtube.com/watch?v=LENLyDDEtUM'>LENLyDDEtUM</a></i>", path: "./images/LENLyDDEtUM/output.json" },
-      { title: "White Rock, B.C. - Memorial Park <i><a href='https://www.youtube.com/watch?v=IRIAXc0iT9A'>IRIAXc0iT9A</a></i>", path: "./images/IRIAXc0iT9A/output.json" },
-      { title: "Surrey, B.C. border <i><a href='https://www.youtube.com/watch?v=Hcl9l2Z8mTI'>Hcl9l2Z8mTI</a></i>", path: "./images/Hcl9l2Z8mTI/output.json" },
-      { title: "Pacific Sands Beach Resort, Tofino, BC <i><a href='https://www.youtube.com/watch?v=g2HGBY2v-wo'>g2HGBY2v-wo</a></i>", path: "./images/g2HGBY2v-wo/output.json" },
-      { title: "Crystal Cove Beach Resort, Tofino, B.C. <i><a href='https://www.youtube.com/watch?v=AovvFApVnKc'>AovvFApVnKc</a></i>", path: "./images/AovvFApVnKc/output.json" },
-      { title: "Whistler Olympic Plaza <i><a href='https://www.youtube.com/watch?v=IEhDUXECe_k'>IEhDUXECe_k</a></i>", path: "./images/IEhDUXECe_k/output.json" },
-      { title: "Whistler Golf Club - 1st hole <i><a href='https://www.youtube.com/watch?v=JVQaZtahjwg'>JVQaZtahjwg</a></i>", path: "./images/JVQaZtahjwg/output.json" },
-      { title: "Howe Sound <i><a href='https://www.youtube.com/watch?v=SDGEHMh3WOA'>SDGEHMh3WOA</a></i>", path: "./images/SDGEHMh3WOA/output.json" },
-      { title: "Mt Seymour Ski Area, Vancouver, BC <i><a href='https://www.youtube.com/watch?v=vLawo-FrBKk'>vLawo-FrBKk</a></i>", path: "./images/vLawo-FrBKk/output.json" },
-      { title: "Deep Cove, Vancouver Canada <i><a href='https://www.youtube.com/watch?v=T0oUufecXeE'>T0oUufecXeE</a></i>", path: "./images/T0oUufecXeE/output.json" },
-      
-      // { title: "Lions Chair Cam <i><a href='https://www.youtube.com/watch?v=lLELhY85VxI'>lLELhY85VxI</a></i>", path: "./images/lLELhY85VxI/output.json" },
-      // { title: "Eagle Chair Cam <i><a href='https://www.youtube.com/watch?v=GTQQdQ8VVKI'>GTQQdQ8VVKI</a></i>", path: "./images/GTQQdQ8VVKI/output.json" },
-      // { title: "Lockeport Crescent Beach Centre, Nova Scotia <i><a href='https://www.youtube.com/watch?v=Pwt0tZlt9eE'>Pwt0tZlt9eE</a></i>", path: "./images/Pwt0tZlt9eE/output.json" },
-      // { title: "Tidal Bore LIVE at Fundy Discovery Site in Truro, Nova Scotia <i><a href='https://www.youtube.com/watch?v=dQzt2xtk7kY'>dQzt2xtk7kY</a></i>", path: "./images/dQzt2xtk7kY/output.json" },
-      // { title: "Parry Sound, Ontario Canada <i><a href='https://www.youtube.com/watch?v=qqSa53vxgBY'>qqSa53vxgBY</a></i>", path: "./images/qqSa53vxgBY/output.json" },
-      // { title: "Port de Québec <i><a href='https://www.youtube.com/watch?v=I-7mv4-BJ7M'>I-7mv4-BJ7M</a></i>", path: "./images/I-7mv4-BJ7M/output.json" },
-      // { title: "Calgary, Alberta <i><a href='https://www.youtube.com/watch?v=MwcqP3ta6RI'>MwcqP3ta6RI</a></i>", path: "./images/MwcqP3ta6RI/output.json" },      
-      // { title: "Regina Bypass Tower Cam <i><a href='https://hotline.gov.sk.ca/map/Cctv/a5j2lv0jyvu--1'>Webpage</a></i>", path: "./images/regina-bypass-tower/output.json" },
-
-      // Non-Canada
-      // ----------------------
-      { title: "Charlotte-Genesee Overlooking Lake Ontario in Rochester, N.Y <i><a href='https://www.youtube.com/watch?v=KTKN8RbYefQ'>KTKN8RbYefQ</a></i>", path: "./images/KTKN8RbYefQ/output.json" },
-      { title: "Cape Town - South Africa <i><a href='https://www.youtube.com/watch?v=-zgjmZ_nZLI'>-zgjmZ_nZLI</a></i>", path: "./images/-zgjmZ_nZLI/output.json" },
-      { title: "Venice - St. Mark's Basin <i><a href='https://www.youtube.com/watch?v=dFBRpHHwQeg'>dFBRpHHwQeg</a></i>", path: "./images/dFBRpHHwQeg/output.json" },
-      { title: "Peace Bridge - Buffalo NY <i><a href='https://www.youtube.com/watch?v=DnUFAShZKus'>DnUFAShZKus</a></i>", path: "./images/DnUFAShZKus/output.json" },
-      { title: "Crystal Bay Beach Resort | Lamai | Koh Samui | Thailand <i><a href='https://www.youtube.com/watch?v=Fw9hgttWzIg'>Fw9hgttWzIg</a></i>", path: "./images/Fw9hgttWzIg/output.json" },
-      { title: "Main Street Canmore <i><a href='https://www.youtube.com/watch?v=kC6_JqEt3GA'>kC6_JqEt3GA</a></i>", path: "./images/kC6_JqEt3GA/output.json" },
-      { title: "Lockeport Crescent Beach Centre, Nova Scotia <i><a href='https://www.youtube.com/watch?v=Pwt0tZlt9eE'>Pwt0tZlt9eE</a></i>", path: "./images/Pwt0tZlt9eE/output.json" },
-      { title: "Greenhill Beach (Weymouth) <i><a href='https://www.youtube.com/watch?v=s2rzmSNpyns'>s2rzmSNpyns</a></i>", path: "./images/s2rzmSNpyns/output.json" },
-      { title: "Blenheim Dawlish <i><a href='https://www.youtube.com/watch?v=Y28zZGsYkjg'>Y28zZGsYkjg</a></i>", path: "./images/Y28zZGsYkjg/output.json" },
+    // All the folders that contain the JSON files
+    const folders = [
+      "-zgjmZ_nZLI",
+      "2G7bdqbL1EU",
+      "4MK3E9EWDSY",
+      "alberta-springbank-airport-cybw",
+      "AovvFApVnKc",
+      "british-columbia-vancouver-airport-cyvr",
+      "calgary-12ave-5st",
+      "dFBRpHHwQeg",
+      "DnUFAShZKus",
+      "dQzt2xtk7kY",
+      "Fq-P0bdelRs",
+      "Fw9hgttWzIg",
+      "g2HGBY2v-wo",
+      "GTQQdQ8VVKI",
+      "Hcl9l2Z8mTI",
+      "I-7mv4-BJ7M",
+      "IEhDUXECe_k",
+      "IRIAXc0iT9A",
+      "JVQaZtahjwg",
+      "kC6_JqEt3GA",
+      "KTKN8RbYefQ",
+      "LENLyDDEtUM",
+      "lLELhY85VxI",
+      "manitoba-dauphin-cydn",
+      "manitoba-minnedosa-hwy10",
+      "MwcqP3ta6RI",
+      "new-brunswick-bathurst-airport-czbf",
+      "new-brunswick-saint-john-millidgeville",
+      "new-brunswick-saint-john-rte1",
+      "new-brunswick-waweig-rte1",
+      "newfoundland-cartwright-airport-cyca",
+      "newfoundland-paddys-pond",
+      "nova-scotia-port-hawkesbury-cypd",
+      "nunavut-arviat-airport-cyek",
+      "nwt-arviat-airport-cyek",
+      "ontario-armstrong-airport-cyyw",
+      "princeedwardisland-st-peters-hwy2",
+      "Pwt0tZlt9eE",
+      "qqSa53vxgBY",
+      "quebec-st-hubert-airport-cyhu",
+      "regina-bypass-tower",
+      "s2rzmSNpyns",
+      "saskatchewan-north-battleford-cyqw",
+      "SDGEHMh3WOA",
+      "T0oUufecXeE",
+      "vLawo-FrBKk",
+      "Y28zZGsYkjg",
+      "yukon-braeburn-airport-cek2",
     ];
 
-    settings.forEach(setting => {
+    // Each of these folders contains two JSON files 
+    // 1. output.json - contains the average color for each frame    
+    // 2. settings.json - contains the title, and description of the webcam
+
+
+
+    folders.forEach(folder => {
       const row = document.createElement('div');
       row.className = 'row';
-
       const header = document.createElement('p');
-      header.innerHTML = setting.title;
       row.appendChild(header);
+
+      // Get the title from settings.json
+      header.innerHTML = folder;
+      fetch(`./images/${folder}/settings.json`)
+        .then(res => res.json())
+        .then(data => {
+
+          let description = '';
+          if (data.description !== undefined && data.description.length > 0) {
+            description = ' - ' + data.description;
+          }
+
+
+          if (data.title === undefined || data.title.length === 0) {
+            header.innerHTML = folder;
+          } else {
+
+            // If the title is a link, add it as a link
+            if (data.link !== undefined && data.link.length > 0) {
+              header.innerHTML = `<a href="${data.link}">${data.title}</a> ${description}`;
+              row.appendChild(link);
+            } else {
+              header.innerHTML = data.title + description;
+            }
+          }
+        })
+        .catch(err => console.error(`Error loading [./images/${folder}/settings.json]:`, err));
 
       const grid = document.createElement('div');
       grid.className = 'color-grid';
       row.appendChild(grid);
 
-      // Load JSON and populate boxes
-      fetch(setting.path)
+      // Get the average colors from output.json
+      fetch(`./images/${folder}/output.json`)
         .then(res => res.json())
         .then(data => {
           data.forEach(item => {
@@ -107,7 +150,7 @@
             grid.appendChild(div);
           });
         })
-        .catch(err => console.error(`Error loading ${setting.path}:`, err));
+        .catch(err => console.error(`Error loading [./images/${folder}/output.json]:`, err));
 
       document.body.appendChild(row);
     });

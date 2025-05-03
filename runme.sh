@@ -19,15 +19,15 @@ OUTPUT_DIR="${SCRIPT_DIR}/images"
 ## ------------------------------------------------------------------------
 
 # Regina, Saskatchewan Bypass Tower Cam
-curl https://hotline.gov.sk.ca/map/Cctv/a5j2lv0jyvu--1 --output "${OUTPUT_DIR}/regina-bypass-tower/${TIMESTAMP}.png"
+curl https://hotline.gov.sk.ca/map/Cctv/a5j2lv0jyvu--1 --output "${OUTPUT_DIR}/regina-bypass-tower/${TIMESTAMP}.jpg"
 
 # 12 Avenue / 5th Street SW - Calgary, Alberta
 # https://511.alberta.ca/cctv
-curl https://511.alberta.ca/map/Cctv/475 --output "${OUTPUT_DIR}/calgary-12ave-5st/${TIMESTAMP}.png"
+curl https://511.alberta.ca/map/Cctv/475 --output "${OUTPUT_DIR}/calgary-12ave-5st/${TIMESTAMP}.jpg"
 
 # manitoba-minnedosa-hwy10
 # https://www.manitoba511.ca/cctv?start=0&length=10&order%5Bi%5D=1&order%5Bdir%5D=asc
-curl https://www.manitoba511.ca/map/Cctv/15 --output "${OUTPUT_DIR}/manitoba-minnedosa-hwy10/${TIMESTAMP}.png"
+curl https://www.manitoba511.ca/map/Cctv/15 --output "${OUTPUT_DIR}/manitoba-minnedosa-hwy10/${TIMESTAMP}.jpg"
 
 # new-brunswick-waweig-rte1
 # https://nbcams.ca/
@@ -225,4 +225,4 @@ curl https://metcam.navcanada.ca/dawc_images/wxcam/CYEK/CYEK_N-full-e.jpeg --out
 
 # Extract the sky parts of the image and delete the original file to save space
 cd "${SCRIPT_DIR}/imageProcessor/"
-npm run extract
+# npm run extract

@@ -4,8 +4,8 @@
   "main": "src/index.ts",
   "scripts": {
     "start": "tsc && npm run batch",
-    "extract": "node dist/index.js extract --settings settings.json",
-    "analyze": "node dist/index.js analyze --settings settings.json",
+    "extract": "node dist/index.js extract ../images",
+    "analyze": "node dist/index.js analyze ../images",
     "batch": " npm run extract && npm run analyze",
 
     "build": "npm run build:0_bundle && npm run build:1_GenerateSeaConfig && npm run build:2_GenerateBlob && npm run build:3_CopyNodeExecutable && npm run build:4_RemoveSignature && npm run build:5_InjectBlob",

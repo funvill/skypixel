@@ -9,9 +9,9 @@ const helpers_1 = require("yargs/helpers");
 const sharp_1 = __importDefault(require("sharp"));
 const promises_1 = __importDefault(require("fs/promises"));
 const path_1 = __importDefault(require("path"));
-const VERSION = 'v2.1 (2025-May-02)';
+const VERSION = 'v3.1 (2025-May-03)';
 function printVersion() {
-    console.log(`SkyPixel CLI \nVersion: ${VERSION}\n`);
+    console.log(`SkyPixel CLI\nVersion: ${VERSION}\n`);
 }
 /**
  * Extracts a sky region and saves to 'sky_' prefixed file.
@@ -32,7 +32,6 @@ async function deleteFile(filePath) {
         await promises_1.default.unlink(filePath);
     }
     catch { }
-    ;
 }
 /**
  * Computes average color of the entire image file.
@@ -50,9 +49,7 @@ async function computeAverage(filePath) {
     }
     const avg = sums.map(sum => Math.round(sum / pixelCount));
     const [r, g, b, a] = avg;
-    return info.channels === 4
-        ? { r, g, b, a }
-        : { r, g, b };
+    return info.channels === 4 ? { r, g, b, a } : { r, g, b };
 }
 /**
  * Saves an SVG palette of 10×10px blocks for each color.
@@ -66,7 +63,7 @@ async function saveSvgBlocks(folder, results) {
         const { r: R, g, b, a } = r.average;
         const x = (i % cols) * block;
         const y = Math.floor(i / cols) * block;
-        const fill = (a !== undefined)
+        const fill = a !== undefined
             ? `rgba(${R},${g},${b},${(a / 255).toFixed(2)})`
             : `rgb(${R},${g},${b})`;
         svgParts.push(`<rect x=\"${x}\" y=\"${y}\" width=\"${block}\" height=\"${block}\" fill=\"${fill}\"/>`);
@@ -74,44 +71,46 @@ async function saveSvgBlocks(folder, results) {
     svgParts.push('</svg>');
     await promises_1.default.writeFile(path_1.default.join(folder, 'output.svg'), svgParts.join(''));
 }
-// EXTRACT commands
-async function extractSingle(file, region) {
-    console.log(`Extracting single file: ${file}`);
-    await saveRegionPreview(file, region);
-    await deleteFile(file);
-    console.log(`Extracted sky and removed original: ${file}`);
-}
-async function extractBatch(settings) {
-    console.log(`Action: Extracting batch`);
-    const entries = JSON.parse(await promises_1.default.readFile(settings, 'utf-8'));
-    for (const e of entries) {
-        let region = { x: +e.x, y: +e.y, width: +e.width, height: +e.height };
-        const files = await promises_1.default.readdir(e.folder);
-        console.log(`🔎 Processing folder: ${e.folder}`);
-        // Filter out non-PNG/JPG files and those starting with 'sky_'
-        const imageFiles = files.filter(f => /\.(png|jpe?g)$/i.test(f) && !/^sky_/i.test(f));
-        if (imageFiles.length === 0) {
-            console.log(`   ❗ WARN: No files to process in folder ${e.folder}`);
+/**
+ * Processes all subfolders under a root directory for extraction.
+ */
+async function processExtract(root) {
+    console.log(`\n🔎 Extracting sky from folders under ${root}\n`);
+    let foldersWithoutSettings = [];
+    const subdirs = await promises_1.default.readdir(root);
+    for (const name of subdirs) {
+        const folder = path_1.default.join(root, name);
+        const stat = await promises_1.default.stat(folder).catch(() => null);
+        if (!stat || !stat.isDirectory())
+            continue;
+        const settingsFile = path_1.default.join(folder, 'settings.json');
+        const hasSettings = await promises_1.default.stat(settingsFile).then(() => true).catch(() => false);
+        if (!hasSettings) {
+            foldersWithoutSettings.push(folder);
+            console.log(`⚠️  Skipping ${folder}: no settings.json`);
             continue;
         }
-        console.log(`   🖼️  Files to process: ${imageFiles.length}`);
-        // Check to see if there is a settings.json file in the folder
-        // If there is then use that instead of the passed in settings
-        const settingsFile = path_1.default.join(e.folder, 'settings.json');
-        if (await promises_1.default.stat(settingsFile).then(() => true).catch(() => false)) {
-            const settingsData = JSON.parse(await promises_1.default.readFile(settingsFile, 'utf-8'));
-            if (settingsData.x !== undefined)
-                region.x = +settingsData.x;
-            if (settingsData.y !== undefined)
-                region.y = +settingsData.y;
-            if (settingsData.width !== undefined)
-                region.width = +settingsData.width;
-            if (settingsData.height !== undefined)
-                region.height = +settingsData.height;
-            console.log(`   ⚙️  Using settings from ${e.folder}/${settingsFile}: ${JSON.stringify(region)}`);
+        const s = JSON.parse(await promises_1.default.readFile(settingsFile, 'utf-8'));
+        // Check if the settings.json file has a 'x', 'y', 'width', 'height' properties
+        // If not skip this folder
+        if (s.x === undefined || s.y === undefined || s.width === undefined || s.height === undefined) {
+            console.log(`⚠️  Skipping ${folder}: no x,y,width,height in settings.json`);
+            continue;
         }
-        for (const f of imageFiles) {
-            const fp = path_1.default.join(e.folder, f);
+        const region = {
+            x: Number(s.x), y: Number(s.y),
+            width: Number(s.width), height: Number(s.height)
+        };
+        console.log(`🔎 Extracting sky for ${folder} using settings ${JSON.stringify(region)}`);
+        const files = await promises_1.default.readdir(folder);
+        const images = files.filter(f => /\.(png|jpe?g)$/i.test(f) && !/^sky_/i.test(f));
+        if (images.length === 0) {
+            console.log(`   ⚠️  No images to extract in ${folder}`);
+            continue;
+        }
+        process.stdout.write(`   📄 Found ${images.length} images to extract `);
+        for (const f of images) {
+            const fp = path_1.default.join(folder, f);
             try {
                 await saveRegionPreview(fp, region);
                 await deleteFile(fp);
@@ -121,22 +120,35 @@ async function extractBatch(settings) {
                 console.error(`\n❌ Error extracting ${fp}:`, err);
             }
         }
-        console.log(`\n✅ Done extract for folder: ${e.folder}`);
+        console.log(`\n   ✅ Done extract for ${folder}\n`);
     }
-    console.log(`\n✅ All done!`);
+    console.log(`\n✅ Done extracting sky from all folders\n`);
+    if (foldersWithoutSettings.length > 0) {
+        console.log(`Folders without settings.json:\n${foldersWithoutSettings.join('\n')}`);
+    }
 }
-// ANALYZE commands
-async function analyzeBatch(settings) {
-    const entries = JSON.parse(await promises_1.default.readFile(settings, 'utf-8'));
-    console.log(`Action: 🔎 Analyzing batch with ${entries.length} folders`);
-    for (const e of entries) {
-        const folder = e.folder;
+/**
+ * Processes all subfolders under a root directory for analysis.
+ */
+async function processAnalyze(root) {
+    console.log(`\n🔎 Analyzing sky images in folders under ${root}\n`);
+    const subdirs = await promises_1.default.readdir(root);
+    for (const name of subdirs) {
+        const folder = path_1.default.join(root, name);
+        const stat = await promises_1.default.stat(folder).catch(() => null);
+        if (!stat || !stat.isDirectory())
+            continue;
+        console.log(`🔎 Analyzing ${folder}`);
         const files = await promises_1.default.readdir(folder);
-        // Include sky_ prefixes for PNG/JPG
         const skies = files.filter(f => /^sky_.*\.(png|jpe?g)$/i.test(f));
+        if (skies.length === 0) {
+            console.log(`   ⚠️  No 'sky_' images in ${folder}`);
+            continue;
+        }
+        process.stdout.write(`   📄 Found ${skies.length} images to analyze `);
         const results = [];
-        console.log(`🔎 Processing folder: ${folder}, ${skies.length} files`);
         for (const f of skies) {
+            // ToDo: Check to see if the file is already analyzed and in the output.json, if so skip it
             try {
                 const avg = await computeAverage(path_1.default.join(folder, f));
                 results.push({ file: f, average: avg });
@@ -145,43 +157,30 @@ async function analyzeBatch(settings) {
             catch (err) {
                 console.error(`\n❌ Error analyzing ${f}:`, err);
             }
+            // ToDo: Update the output.json with the new average for this file.
         }
         await promises_1.default.writeFile(path_1.default.join(folder, 'output.json'), JSON.stringify(results, null, 2));
+        // ToDo: Load the output.json and generate the SVG blocks for all the images in the output.json
         await saveSvgBlocks(folder, results);
-        console.log(`\n✅ Wrote ${results.length} records and output.svg for ${folder}`);
+        console.log(`\n✅ Wrote ${results.length} records and output.svg for ${folder}\n`);
     }
 }
+/**
+ * CLI entrypoint.
+ */
 function main() {
-    // CLI setup
     printVersion();
+    // ToDo: Add a command to not delete the original images --NoDelete
+    // ToDo: Add a command to remove the output.json before analyze command --ClearOutput
     (0, yargs_1.default)((0, helpers_1.hideBin)(process.argv))
-        .command('extract', 'Extract sky regions and delete originals', yargs => yargs
-        .option('file', { type: 'string', describe: 'Single image file to extract (PNG/JPG)' })
-        .option('x', { type: 'number', describe: 'X coordinate' })
-        .option('y', { type: 'number', describe: 'Y coordinate' })
-        .option('width', { type: 'number', describe: 'Region width' })
-        .option('height', { type: 'number', describe: 'Region height' })
-        .option('settings', { type: 'string', describe: 'Path to settings JSON' })
-        .check(argv => {
-        if (argv.settings)
-            return true;
-        for (const opt of ['file', 'x', 'y', 'width', 'height']) {
-            if (argv[opt] === undefined)
-                throw new Error(`--${opt} required`);
-        }
-        return true;
-    }), async (argv) => {
-        if (argv.settings)
-            await extractBatch(argv.settings);
-        else
-            await extractSingle(argv.file, { x: argv.x, y: argv.y, width: argv.width, height: argv.height });
+        .command('extract <root>', 'Extract sky regions and delete originals in each subfolder', yargs => yargs.positional('root', { type: 'string', describe: 'Path to root folder containing subfolders' }), async (argv) => {
+        await processExtract(argv.root);
     })
-        .command('analyze', 'Compute averages and update outputs', yargs => yargs.option('settings', { type: 'string', demandOption: true, describe: 'Path to settings JSON' }), async (argv) => {
-        await analyzeBatch(argv.settings);
+        .command('analyze <root>', 'Compute averages and update outputs in each subfolder', yargs => yargs.positional('root', { type: 'string', describe: 'Path to root folder containing subfolders' }), async (argv) => {
+        await processAnalyze(argv.root);
     })
         .demandCommand(1)
         .help()
         .parse();
 }
 main();
-// End of file
