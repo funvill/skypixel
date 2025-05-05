@@ -8,7 +8,7 @@
     "analyze": "node dist/index.js analyze ../images",
     "visuals": "node dist/index.js generateVisuals ../images",
 
-    "batch": " npm run extract && npm run analyze",
+    "batch": " npm run extract && npm run analyze && npm run visuals",
 
     "build": "npm run build:0_bundle && npm run build:1_GenerateSeaConfig && npm run build:2_GenerateBlob && npm run build:3_CopyNodeExecutable && npm run build:4_RemoveSignature && npm run build:5_InjectBlob",
     "build:0_bundle": "esbuild app.js --bundle --platform=node --outfile=bundle.js",

@@ -122,10 +122,35 @@
             // If the title is a link, add it as a link
             if (data.link !== undefined && data.link.length > 0) {
               header.innerHTML = `<a href="${data.link}">${data.title}</a> ${description}`;
-              row.appendChild(link);
+              // row.appendChild(link);
             } else {
               header.innerHTML = data.title + description;
             }
+
+            // Add two links. vorgelSprial.svg and evenSpiral.svg
+            // These two files are in the same folder as the JSON files, and always exist 
+            header.appendChild(document.createTextNode(' '));
+            const voronoiLink = document.createElement('a');
+            voronoiLink.href = `./images/${folder}/VogelSpiral.svg`;
+            voronoiLink.innerHTML = 'Voronoi Spiral';
+            voronoiLink.target = '_blank';
+            header.appendChild(voronoiLink);
+
+            header.appendChild(document.createTextNode(' '));
+            const evenLink = document.createElement('a');
+            evenLink.href = `./images/${folder}/evenSpiral.svg`;
+            evenLink.innerHTML = 'Even Spiral';
+            evenLink.target = '_blank';
+            header.appendChild(evenLink);
+            header.appendChild(document.createTextNode(' '));
+
+            header.appendChild(document.createTextNode(' '));
+            const outputLink = document.createElement('a');
+            outputLink.href = `./images/${folder}/output.svg`;
+            outputLink.innerHTML = 'Day output';
+            outputLink.target = '_blank';
+            header.appendChild(outputLink);
+            header.appendChild(document.createTextNode(' '));
           }
         })
         .catch(err => console.error(`Error loading [./images/${folder}/settings.json]:`, err));

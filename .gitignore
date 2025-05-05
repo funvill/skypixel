@@ -1,5 +1,6 @@
 *.png
 *.jpg
+visualization.svg
 node_modules
 cron_capture.log
 large_output.svg

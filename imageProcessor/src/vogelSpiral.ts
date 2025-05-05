@@ -10,16 +10,26 @@ const CONFIG = {
   backgroundColor: 'black',         // SVG background color
   spacingFactor: 0.9,               // fraction of diameter between centers (<1 for overlap)
   goldenAngle: Math.PI * (3 - Math.sqrt(5)), // Vogel's spiral angle
-
-  // Feature toggles
-  enableSizeVariation: false,       // vary circle size randomly
-  sizeVariationFactor: 0.2,         // max ± variation (fraction of base radius)
+  pathStroke: 'red',                // color for spiral path segments
+  pathStrokeWidth: 1,               // width of spiral path segments
+  debugNumbers: false,              // show numbers on circles
+  debugSegmentLines: false,         // show lines between circles
 };
 
 /**
- * Generates a Vogel-style spiral visualization SVG with optional effects.
+ * Calculates appropriate text color (black or white) for contrast against given RGB.
  */
-export async function generateVisuals(root: string) {
+function getContrastingTextColor(r: number, g: number, b: number): string {
+  // Perceived luminance
+  const luminance = 0.299 * r + 0.587 * g + 0.114 * b;
+  return luminance > 186 ? 'black' : 'white';
+}
+
+/**
+ * Generates a Vogel-style spiral visualization SVG with radial spokes,
+ * continuous red path, and numbered circles with contrasting text.
+ */
+export async function vogelSpiral(root: string) {
   console.log(`\n🔎 Generating visuals under ${root}\n`);
   const subdirs = await fs.readdir(root);
 
@@ -30,8 +40,10 @@ export async function generateVisuals(root: string) {
     backgroundColor,
     spacingFactor,
     goldenAngle,
-    enableSizeVariation,
-    sizeVariationFactor
+    pathStroke,
+    pathStrokeWidth,
+    debugNumbers,
+    debugSegmentLines
   } = CONFIG;
 
   const diameter = circleRadius * 2;
@@ -64,10 +76,9 @@ export async function generateVisuals(root: string) {
 
     const svgParts: string[] = [];
     svgParts.push(
-      `<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"${canvasSize}\" height=\"${canvasSize}\">`,
-      `<rect width=\"100%\" height=\"100%\" fill=\"${backgroundColor}\"/>`
+      `<svg xmlns="http://www.w3.org/2000/svg" width="${canvasSize}" height="${canvasSize}">`,
+      `<rect width="100%" height="100%" fill="${backgroundColor}"/>`
     );
-
 
     // Compute spiral coordinates
     const coords: { x: number; y: number }[] = [];
@@ -79,37 +90,48 @@ export async function generateVisuals(root: string) {
         y: center + r * Math.sin(theta)
       });
     }
+    // Red path segments
+    if (debugSegmentLines) {
+      for (let i = 1; i < coords.length; i++) {
+        const prev = coords[i - 1];
+        const curr = coords[i];
+        svgParts.push(
+          `<line x1="${prev.x.toFixed(2)}" y1="${prev.y.toFixed(2)}" ` +
+          `x2="${curr.x.toFixed(2)}" y2="${curr.y.toFixed(2)}" ` +
+          `stroke="${pathStroke}" stroke-width="${pathStrokeWidth}"/>`
+        );
+      }
+    }
 
-
-    // Draw circles
+    // Draw numbered circles with contrasting text
     coords.forEach((pt, i) => {
       const avg = data[i].average;
+      const r = avg.r;
+      const g = avg.g;
+      const b = avg.b;
       const fill = avg.a !== undefined
-        ? `rgba(${avg.r},${avg.g},${avg.b},${(avg.a/255).toFixed(2)})`
-        : `rgb(${avg.r},${avg.g},${avg.b})`;
+        ? `rgba(${r},${g},${b},${(avg.a / 255).toFixed(2)})`
+        : `rgb(${r},${g},${b})`;
 
-      // size variation
-      let rVar = circleRadius;
-      if (enableSizeVariation) {
-        const delta = (Math.random() * 2 - 1) * sizeVariationFactor * circleRadius;
-        rVar += delta;
-      }
-
-      // opacity fade
-      let opacity = 1;
-      
       svgParts.push(
-        `<circle cx=\"${pt.x.toFixed(2)}\" cy=\"${pt.y.toFixed(2)}\" ` +
-        `r=\"${rVar.toFixed(2)}\" fill=\"${fill}\"` +
-        ` stroke=\"${strokeColor}\" stroke-width=\"${strokeWidth}\"` +
-        ` fill-opacity=\"${opacity.toFixed(2)}\"/>`
+        `<circle cx="${pt.x.toFixed(2)}" cy="${pt.y.toFixed(2)}" ` +
+        `r="${circleRadius}" fill="${fill}" ` +
+        `stroke="${strokeColor}" stroke-width="${strokeWidth}"/>`
       );
+
+      if (debugNumbers) {
+        const textColor = getContrastingTextColor(r, g, b);
+        svgParts.push(
+          `<text x="${pt.x.toFixed(2)}" y="${(pt.y + circleRadius / 3).toFixed(2)}" ` +
+          `text-anchor="middle" alignment-baseline="middle" ` +
+          `font-size="${circleRadius}px" fill="${textColor}">${i + 1}</text>`
+        );
+      }
     });
 
     svgParts.push('</svg>');
-
-    const svgPath = path.join(folder, 'visualization.svg');
+    const svgPath = path.join(folder, 'VogelSpiral.svg');
     await fs.writeFile(svgPath, svgParts.join(''));
-    console.log(`✅ Generated visualization.svg for ${folder}`);
+    console.log(`✅ Generated VogelSpiral.svg for ${folder}`);
   }
 }

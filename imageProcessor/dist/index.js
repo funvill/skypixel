@@ -6,9 +6,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const yargs_1 = __importDefault(require("yargs"));
 const helpers_1 = require("yargs/helpers");
-const generateVisuals_1 = require("./generateVisuals");
 const processExtract_1 = require("./processExtract");
 const processAnalyze_1 = require("./processAnalyze");
+const vogelSpiral_1 = require("./vogelSpiral");
+const evenSpiral_1 = require("./evenSpiral");
+const svgDay_1 = require("./svgDay");
 const VERSION = 'v3.2 (2025-May-03)';
 function printVersion() {
     console.log(`SkyPixel CLI\nVersion: ${VERSION}\n`);
@@ -29,8 +31,10 @@ function main() {
         .option('clearOutput', { type: 'boolean', default: false, describe: 'Remove existing output.json before analyzing' }), async (argv) => {
         await (0, processAnalyze_1.processAnalyze)(argv.root, argv.clearOutput);
     })
-        .command('generateVisuals <root>', 'Generate spiral visualizations in each subfolder', yargs => yargs.positional('root', { type: 'string', describe: 'Path to root folder containing subfolders' }), async (argv) => {
-        await (0, generateVisuals_1.generateVisuals)(argv.root);
+        .command('generateVisuals <root>', 'Generate visualizations in each subfolder', yargs => yargs.positional('root', { type: 'string', describe: 'Path to root folder containing subfolders' }), async (argv) => {
+        await (0, evenSpiral_1.evenSpiral)(argv.root);
+        await (0, vogelSpiral_1.vogelSpiral)(argv.root);
+        await (0, svgDay_1.svgDay)(argv.root);
     })
         .demandCommand(1)
         .help()

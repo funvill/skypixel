@@ -225,4 +225,4 @@ curl https://metcam.navcanada.ca/dawc_images/wxcam/CYEK/CYEK_N-full-e.jpeg --out
 
 # Extract the sky parts of the image and delete the original file to save space
 cd "${SCRIPT_DIR}/imageProcessor/"
-# npm run extract
+npm run extract
