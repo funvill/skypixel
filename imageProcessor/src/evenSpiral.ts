@@ -141,6 +141,6 @@ export async function evenSpiral(root: string) {
     svg.push('</svg>');
 
     await fs.writeFile(path.join(folder, 'evenSpiral.svg'), svg.join(''));
-    console.log(`✅ Generated evenSpiral.svg for ${folder}`);
+    console.log(`✅ Generated ${folder}/evenSpiral.svg (${size.toFixed(0)}×${size.toFixed(0)})`);
   }
 }

@@ -31,29 +31,6 @@ async function computeAverage(filePath: string) {
   return info.channels === 4 ? { r, g, b, a } : { r, g, b };
 }
 
-/**
- * Saves an SVG palette of 10×10px blocks for each color.
- */
-async function saveSvgBlocks(folder: string, results: { file: string; average: any }[]) {
-  const block = 10;
-  const cols = Math.min(10, results.length);
-  const rows = Math.ceil(results.length / cols);
-  const svgParts = [`<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"${cols*block}\" height=\"${rows*block}\">`];
-
-  results.forEach((r, i) => {
-    const { r: R, g, b, a } = r.average;
-    const x = (i % cols) * block;
-    const y = Math.floor(i / cols) * block;
-    const fill = a !== undefined
-      ? `rgba(${R},${g},${b},${(a/255).toFixed(2)})`
-      : `rgb(${R},${g},${b})`;
-    svgParts.push(`<rect x=\"${x}\" y=\"${y}\" width=\"${block}\" height=\"${block}\" fill=\"${fill}\"/>`);
-  });
-
-  svgParts.push('</svg>');
-  await fs.writeFile(path.join(folder, 'output.svg'), svgParts.join(''));
-}
-
 
 /**
  * Processes all subfolders under a root directory for analysis.
@@ -104,7 +81,6 @@ export async function processAnalyze(root: string, clearOutput: boolean) {
     }
 
     await fs.writeFile(outputPath, JSON.stringify(results, null, 2));
-    await saveSvgBlocks(folder, results);
-    console.log(`\n   ✅ Wrote ${results.length} records to output.json and output.svg for ${folder}\n`);
+    console.log(`\n   ✅ Wrote ${results.length} records to output.json for ${folder}\n`);
   }
 }

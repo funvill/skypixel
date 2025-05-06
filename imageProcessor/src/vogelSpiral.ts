@@ -132,6 +132,6 @@ export async function vogelSpiral(root: string) {
     svgParts.push('</svg>');
     const svgPath = path.join(folder, 'VogelSpiral.svg');
     await fs.writeFile(svgPath, svgParts.join(''));
-    console.log(`✅ Generated VogelSpiral.svg for ${folder}`);
+    console.log(`✅ Generated ${folder}/VogelSpiral.svg (${canvasSize.toFixed(0)}×${canvasSize.toFixed(0)})`);
   }
 }

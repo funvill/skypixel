@@ -7,30 +7,22 @@
   <style>
     body {
       margin: 0;
-      padding: 16px;
+      padding-left: 16px;
       font-family: sans-serif;
+      width: 100%;
     }
-
-    .row {
-      margin-bottom: 24px;
+    .row img {
+      max-width: 100%;
+      height: auto;
+      width: 100%;
+    }    
+    .row h3 {
+      margin-bottom: 0;
     }
-
     .row p {
-      margin: 0 0 8px;
+      margin-top: 0;
     }
 
-    .color-grid {
-      display: flex;
-      flex-wrap: wrap;
-    }
-
-    .color-box {
-      width: 20px;
-      height: 20px;
-      margin: 0px;
-      border: 1px solid #ccc;
-      box-sizing: border-box;
-    }
   </style>
 </head>
 
@@ -92,92 +84,40 @@
     ];
 
     // Each of these folders contains two JSON files 
-    // 1. output.json - contains the average color for each frame    
-    // 2. settings.json - contains the title, and description of the webcam
+    // 1. settings.json - contains the title, and description (maybe empty), and a link to the source web cam.
+    // 2. Each folder contains a file called dayChart.svg display this image
+    // 3. Each folder contains several different visualizations, VogelSpiral.svg, evenSpiral.svg, etc.. These should be links to new tabs
 
-
-
+    // It should be in this format
+    // <h3>Title</h3>
+    // <p>Description {Link to source}, {Link to other visulizations}</p>
+    // <img src="dayChart.svg" alt="Day Chart" />
+    
     folders.forEach(folder => {
-      const row = document.createElement('div');
-      row.className = 'row';
-      const header = document.createElement('p');
-      row.appendChild(header);
 
-      // Get the title from settings.json
-      header.innerHTML = folder;
       fetch(`./images/${folder}/settings.json`)
-        .then(res => res.json())
+        .then(response => response.json())
         .then(data => {
+          const title = data.title;
+          const description = data.description || "";
+          const sourceLink = data.link ? `<a href="${data.link}">Source</a>` : "";
 
-          let description = '';
-          if (data.description !== undefined && data.description.length > 0) {
-            description = ' - ' + data.description;
-          }
+          const visualizations = ['VogelSpiral.svg', 'evenSpiral.svg'];
+          const visualizationLinks = visualizations.map(vis => {
+            return `<a href="./images/${folder}/${vis}" target="_blank">${vis}</a>`;
+          }).join(", ");
+          const otherLinks = visualizationLinks.length > 0 ? visualizationLinks : "";
 
+          const html = `
+            <div class="row">
+              <h3>${title}</h3>
+              <p>${description} ${sourceLink}, ${visualizationLinks}</p>
+              <img src="./images/${folder}/dayChart.svg" alt="Day Chart" />
+            </div>
+          `;
 
-          if (data.title === undefined || data.title.length === 0) {
-            header.innerHTML = folder;
-          } else {
-
-            // If the title is a link, add it as a link
-            if (data.link !== undefined && data.link.length > 0) {
-              header.innerHTML = `<a href="${data.link}">${data.title}</a> ${description}`;
-              // row.appendChild(link);
-            } else {
-              header.innerHTML = data.title + description;
-            }
-
-            // Add two links. vorgelSprial.svg and evenSpiral.svg
-            // These two files are in the same folder as the JSON files, and always exist 
-            header.appendChild(document.createTextNode(' '));
-            const voronoiLink = document.createElement('a');
-            voronoiLink.href = `./images/${folder}/VogelSpiral.svg`;
-            voronoiLink.innerHTML = 'Voronoi Spiral';
-            voronoiLink.target = '_blank';
-            header.appendChild(voronoiLink);
-
-            header.appendChild(document.createTextNode(' '));
-            const evenLink = document.createElement('a');
-            evenLink.href = `./images/${folder}/evenSpiral.svg`;
-            evenLink.innerHTML = 'Even Spiral';
-            evenLink.target = '_blank';
-            header.appendChild(evenLink);
-            header.appendChild(document.createTextNode(' '));
-
-            header.appendChild(document.createTextNode(' '));
-            const outputLink = document.createElement('a');
-            outputLink.href = `./images/${folder}/output.svg`;
-            outputLink.innerHTML = 'Day output';
-            outputLink.target = '_blank';
-            header.appendChild(outputLink);
-            header.appendChild(document.createTextNode(' '));
-          }
-        })
-        .catch(err => console.error(`Error loading [./images/${folder}/settings.json]:`, err));
-
-      const grid = document.createElement('div');
-      grid.className = 'color-grid';
-      row.appendChild(grid);
-
-      // Get the average colors from output.json
-      fetch(`./images/${folder}/output.json`)
-        .then(res => res.json())
-        .then(data => {
-          data.forEach(item => {
-            const div = document.createElement('div');
-            div.className = 'color-box';
-            const avg = item.average;
-            const fill = avg.a !== undefined
-              ? `rgba(${avg.r},${avg.g},${avg.b},${(avg.a / 255).toFixed(2)})`
-              : `rgb(${avg.r},${avg.g},${avg.b})`;
-            div.style.backgroundColor = fill;
-            div.title = item.file;
-            grid.appendChild(div);
-          });
-        })
-        .catch(err => console.error(`Error loading [./images/${folder}/output.json]:`, err));
-
-      document.body.appendChild(row);
+          document.body.insertAdjacentHTML('beforeend', html);
+        });
     });
   </script>
 </body>

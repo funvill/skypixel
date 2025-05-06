@@ -103,7 +103,7 @@ async function vogelSpiral(root) {
         svgParts.push('</svg>');
         const svgPath = path_1.default.join(folder, 'VogelSpiral.svg');
         await promises_1.default.writeFile(svgPath, svgParts.join(''));
-        console.log(`✅ Generated VogelSpiral.svg for ${folder}`);
+        console.log(`✅ Generated ${folder}/VogelSpiral.svg (${canvasSize.toFixed(0)}×${canvasSize.toFixed(0)})`);
     }
 }
 exports.vogelSpiral = vogelSpiral;
