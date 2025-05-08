@@ -5,7 +5,7 @@ import path from 'path';
 // === Visualization Settings ===
 const CONFIG = {
   boxSize: 20,                     // size of each box in pixels
-  pointsOnARow: 24 * 60 / 5,      // boxes per row (e.g., minutes per day / interval)
+  pointsOnARow: (24 * 60) / 5,      // boxes per row (e.g., minutes per day / interval)
   backgroundColor: 'white',       // canvas background color
   labelOffset: false,             // label each box with its sequence index
   intervalMinutes: 5,             // expected interval between data points (minutes)
@@ -14,7 +14,7 @@ const CONFIG = {
 };
 
 export async function dayChart(root: string) {
-  console.log(`\n🔎 Generating day chart under ${root}\n`);
+  console.log(`\n🔎 Generating dayChart under ${root}\n`);
   const subdirs = await fs.readdir(root);
   const {
     boxSize,

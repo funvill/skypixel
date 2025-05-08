@@ -1,9 +1,9 @@
 {
-  "x": 250,
-  "width": 200,
+  "x": 0,
+  "width": 150,
   "y": 0,
-  "height": 120,
+  "height": 150,
   "title": "12 Avenue / 5th Street SW - Calgary, Alberta",
   "link": "https://511.alberta.ca/cctv",
-  "description": ""
+  "description": "- [2025-May-08] Noticed that they moved the camera. Moved it to look at street lights on sky_20250506_2245. Then moved it again on sky_20250507_2105 to look at a building. I updated the settings to extract a different part of the image for the sky on 20250508_0920"
 }

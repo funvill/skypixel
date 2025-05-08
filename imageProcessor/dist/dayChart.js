@@ -10,7 +10,7 @@ const path_1 = __importDefault(require("path"));
 // === Visualization Settings ===
 const CONFIG = {
     boxSize: 20, // size of each box in pixels
-    pointsOnARow: 24 * 60 / 5, // boxes per row (e.g., minutes per day / interval)
+    pointsOnARow: (24 * 60) / 5, // boxes per row (e.g., minutes per day / interval)
     backgroundColor: 'white', // canvas background color
     labelOffset: false, // label each box with its sequence index
     intervalMinutes: 5, // expected interval between data points (minutes)
@@ -18,7 +18,7 @@ const CONFIG = {
     missingFill: 'green' // fill color for missing data slots
 };
 async function dayChart(root) {
-    console.log(`\n🔎 Generating day chart under ${root}\n`);
+    console.log(`\n🔎 Generating dayChart under ${root}\n`);
     const subdirs = await promises_1.default.readdir(root);
     const { boxSize, pointsOnARow, backgroundColor, labelOffset, intervalMinutes, toleranceMinutes, missingFill } = CONFIG;
     const msInterval = intervalMinutes * 60 * 1000;

@@ -220,6 +220,11 @@ curl https://metcam.navcanada.ca/dawc_images/wxcam/CYEK/CYEK_N-full-e.jpeg --out
 # https://www.youtube.com/watch?v=-zgjmZ_nZLI
 "${SCRIPT_DIR}/capture_frame.sh" -zgjmZ_nZLI
 
+# Cape Town - South Africa
+# https://www.youtube.com/watch?v=X5GOIhzRAC8
+"${SCRIPT_DIR}/capture_frame.sh" X5GOIhzRAC8
+
+
 
 # ------------------------------------------------------------------------
 

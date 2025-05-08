@@ -11,6 +11,7 @@ const processAnalyze_1 = require("./processAnalyze");
 const vogelSpiral_1 = require("./vogelSpiral");
 const evenSpiral_1 = require("./evenSpiral");
 const dayChart_1 = require("./dayChart");
+const svgOutput_1 = require("./svgOutput");
 const VERSION = 'v3.2 (2025-May-03)';
 function printVersion() {
     console.log(`SkyPixel CLI\nVersion: ${VERSION}\n`);
@@ -35,6 +36,7 @@ function main() {
         await (0, evenSpiral_1.evenSpiral)(argv.root);
         await (0, vogelSpiral_1.vogelSpiral)(argv.root);
         await (0, dayChart_1.dayChart)(argv.root);
+        await (0, svgOutput_1.svgOutput)(argv.root);
     })
         .demandCommand(1)
         .help()
