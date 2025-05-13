@@ -33,7 +33,7 @@
   <script>
     // All the folders that contain the JSON files
     const folders = [
-      "zgjmZ_nZLI",
+      "-zgjmZ_nZLI",
       "X5GOIhzRAC8",
       "2G7bdqbL1EU",
       "4MK3E9EWDSY",
@@ -103,7 +103,7 @@
           const description = data.description || "";
           const sourceLink = data.link ? `<a href="${data.link}">Source</a>` : "";
 
-          const visualizations = ['VogelSpiral.svg', 'evenSpiral.svg'];
+          const visualizations = ['VogelSpiral.svg', 'evenSpiral.svg', 'output.svg', 'dayChart.svg'];
           const visualizationLinks = visualizations.map(vis => {
             return `<a href="./images/${folder}/${vis}" target="_blank">${vis}</a>`;
           }).join(", ");
