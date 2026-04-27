@@ -4,9 +4,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.evenSpiral = void 0;
+exports.evenSpiralFolder = exports.evenSpiral = void 0;
 const promises_1 = __importDefault(require("fs/promises"));
 const path_1 = __importDefault(require("path"));
+const data_1 = require("./data");
 // === Visualization Settings ===
 const CONFIG = {
     circleRadius: 5, // radius of each circle in pixels (bead radius)
@@ -64,65 +65,72 @@ function findTheta2(b, theta1, target, maxStep) {
 async function evenSpiral(root) {
     console.log(`\n🔎 Generating Archimedes-bead spiral under ${root}\n`);
     const subdirs = await promises_1.default.readdir(root);
-    const { circleRadius, strokeWidth, strokeColor, backgroundColor, b, maxThetaStep, chord, enableText, enablePathStroke, pathStroke, pathStrokeWidth } = CONFIG;
     for (const name of subdirs) {
         const folder = path_1.default.join(root, name);
-        const stat = await promises_1.default.stat(folder).catch(() => null);
-        if (!(stat === null || stat === void 0 ? void 0 : stat.isDirectory()))
-            continue;
-        const outputPath = path_1.default.join(folder, 'output.json');
-        if (!(await promises_1.default.stat(outputPath).then(() => true).catch(() => false)))
-            continue;
-        const data = JSON.parse(await promises_1.default.readFile(outputPath, 'utf-8'));
-        const n = data.length;
-        if (n === 0)
-            continue;
-        // compute coords on spiral
-        const coords = [];
-        let theta = 0;
-        coords.push({ x: 0, y: 0 }); // center
-        for (let i = 1; i < n; i++) {
-            theta = findTheta2(b, theta, chord, maxThetaStep);
-            const r = b * theta;
-            coords.push({ x: r * Math.cos(theta), y: r * Math.sin(theta) });
-        }
-        // determine canvas
-        const maxR = Math.max(...coords.map(p => Math.hypot(p.x, p.y)));
-        const size = (maxR + circleRadius) * 2;
-        const center = size / 2;
-        const svg = [];
-        svg.push(`<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"${size}\" height=\"${size}\">`, `<rect width=\"100%\" height=\"100%\" fill=\"${backgroundColor}\"/>`);
-        // path segments
-        if (enablePathStroke) {
-            for (let i = 1; i < coords.length; i++) {
-                const p0 = coords[i - 1];
-                const p1 = coords[i];
-                svg.push(`<line x1=\"${(center + p0.x).toFixed(2)}\" y1=\"${(center + p0.y).toFixed(2)}\" ` +
-                    `x2=\"${(center + p1.x).toFixed(2)}\" y2=\"${(center + p1.y).toFixed(2)}\" ` +
-                    `stroke=\"${pathStroke}\" stroke-width=\"${pathStrokeWidth}\"/>`);
-            }
-        }
-        // beads & labels
-        coords.forEach((pt, i) => {
-            const cx = center + pt.x;
-            const cy = center + pt.y;
-            const avg = data[i].average;
-            const fill = avg.a !== undefined
-                ? `rgba(${avg.r},${avg.g},${avg.b},${(avg.a / 255).toFixed(2)})`
-                : `rgb(${avg.r},${avg.g},${avg.b})`;
-            svg.push(`<circle cx=\"${cx.toFixed(2)}\" cy=\"${cy.toFixed(2)}\" ` +
-                `r=\"${circleRadius}\" fill=\"${fill}\" ` +
-                `stroke=\"${strokeColor}\" stroke-width=\"${strokeWidth}\"/>`);
-            if (enableText) {
-                const textColor = getContrastingTextColor(avg.r, avg.g, avg.b);
-                svg.push(`<text x=\"${cx.toFixed(2)}\" y=\"${(cy + circleRadius / 3).toFixed(2)}\" ` +
-                    `text-anchor=\"middle\" alignment-baseline=\"middle\" ` +
-                    `font-size=\"${circleRadius}px\" fill=\"${textColor}\">${i + 1}</text>`);
-            }
-        });
-        svg.push('</svg>');
-        await promises_1.default.writeFile(path_1.default.join(folder, 'evenSpiral.svg'), svg.join(''));
-        console.log(`✅ Generated ${folder}/evenSpiral.svg (${size.toFixed(0)}×${size.toFixed(0)})`);
+        await renderEvenSpiralFolder(folder, CONFIG);
     }
 }
 exports.evenSpiral = evenSpiral;
+async function evenSpiralFolder(folder) {
+    await renderEvenSpiralFolder(folder, CONFIG);
+}
+exports.evenSpiralFolder = evenSpiralFolder;
+async function renderEvenSpiralFolder(folder, config) {
+    const stat = await promises_1.default.stat(folder).catch(() => null);
+    if (!(stat === null || stat === void 0 ? void 0 : stat.isDirectory()))
+        return;
+    const outputPath = path_1.default.join(folder, 'output.json');
+    if (!(await promises_1.default.stat(outputPath).then(() => true).catch(() => false)))
+        return;
+    const data = await (0, data_1.loadMergedEntries)(folder);
+    const n = data.length;
+    if (n === 0)
+        return;
+    const { circleRadius, strokeWidth, strokeColor, backgroundColor, b, maxThetaStep, chord, enableText, enablePathStroke, pathStroke, pathStrokeWidth } = config;
+    // compute coords on spiral
+    const coords = [];
+    let theta = 0;
+    coords.push({ x: 0, y: 0 }); // center
+    for (let i = 1; i < n; i++) {
+        theta = findTheta2(b, theta, chord, maxThetaStep);
+        const r = b * theta;
+        coords.push({ x: r * Math.cos(theta), y: r * Math.sin(theta) });
+    }
+    // determine canvas
+    const maxR = Math.max(...coords.map(p => Math.hypot(p.x, p.y)));
+    const size = (maxR + circleRadius) * 2;
+    const center = size / 2;
+    const svg = [];
+    svg.push(`<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"${size}\" height=\"${size}\">`, `<rect width=\"100%\" height=\"100%\" fill=\"${backgroundColor}\"/>`);
+    // path segments
+    if (enablePathStroke) {
+        for (let i = 1; i < coords.length; i++) {
+            const p0 = coords[i - 1];
+            const p1 = coords[i];
+            svg.push(`<line x1=\"${(center + p0.x).toFixed(2)}\" y1=\"${(center + p0.y).toFixed(2)}\" ` +
+                `x2=\"${(center + p1.x).toFixed(2)}\" y2=\"${(center + p1.y).toFixed(2)}\" ` +
+                `stroke=\"${pathStroke}\" stroke-width=\"${pathStrokeWidth}\"/>`);
+        }
+    }
+    // beads & labels
+    coords.forEach((pt, i) => {
+        const cx = center + pt.x;
+        const cy = center + pt.y;
+        const avg = data[i].average;
+        const fill = avg.a !== undefined
+            ? `rgba(${avg.r},${avg.g},${avg.b},${(avg.a / 255).toFixed(2)})`
+            : `rgb(${avg.r},${avg.g},${avg.b})`;
+        svg.push(`<circle cx=\"${cx.toFixed(2)}\" cy=\"${cy.toFixed(2)}\" ` +
+            `r=\"${circleRadius}\" fill=\"${fill}\" ` +
+            `stroke=\"${strokeColor}\" stroke-width=\"${strokeWidth}\"/>`);
+        if (enableText) {
+            const textColor = getContrastingTextColor(avg.r, avg.g, avg.b);
+            svg.push(`<text x=\"${cx.toFixed(2)}\" y=\"${(cy + circleRadius / 3).toFixed(2)}\" ` +
+                `text-anchor=\"middle\" alignment-baseline=\"middle\" ` +
+                `font-size=\"${circleRadius}px\" fill=\"${textColor}\">${i + 1}</text>`);
+        }
+    });
+    svg.push('</svg>');
+    await promises_1.default.writeFile(path_1.default.join(folder, 'evenSpiral.svg'), svg.join(''));
+    console.log(`✅ Generated ${folder}/evenSpiral.svg (${size.toFixed(0)}×${size.toFixed(0)})`);
+}

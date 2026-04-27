@@ -1,0 +1,109 @@
+{
+  "location": {
+    "title": "Whistler",
+    "latitude": 50.1187095,
+    "longitude": -122.9545036,
+    "timezone": "America/Vancouver",
+    "year": 2025
+  },
+  "generator": {
+    "weather": {
+      "cachePolicy": "prefer-cache",
+      "apiBaseUrl": "https://archive-api.open-meteo.com/v1/archive",
+      "transitionMinutes": 20,
+      "visibilityFallbackMeters": 16000
+    },
+    "palette": {
+      "preDawn": { "r": 18, "g": 28, "b": 48 },
+      "dawnGray": { "r": 88, "g": 100, "b": 128 },
+      "sunriseWarm": { "r": 228, "g": 176, "b": 122 },
+      "dayBlue": { "r": 126, "g": 184, "b": 236 },
+      "dusk": { "r": 214, "g": 156, "b": 120 },
+      "twilightGray": { "r": 104, "g": 110, "b": 130 },
+      "night": { "r": 12, "g": 20, "b": 36 }
+    },
+    "lighting": {
+      "radiationStrength": 1,
+      "cloudDarkeningStrength": 1,
+      "moistureDarkeningStrength": 1,
+      "exposureStrength": 1,
+      "summerDayCoreFlatteningStrength": 1,
+      "rendererDayCoreDarkeningStrength": 1,
+      "seasonalSaturationBase": 0.98,
+      "seasonalSaturationAmplitude": 0.03
+    },
+    "transition": {
+      "dawnDuskJitterStrength": 0,
+      "warmthStrength": 1,
+      "coolStrength": 1,
+      "featherStrength": 1,
+      "occlusionStrength": 1,
+      "ambientStrength": 1
+    },
+    "camera": {
+      "dayCoolStrength": 1,
+      "twilightCoolStrength": 1,
+      "grayCloudStrength": 1,
+      "lowLightJitterStrength": 1
+    },
+    "moon": {
+      "brightness": 1,
+      "blueBoost": 1,
+      "flareStrength": 1
+    },
+    "noise": {
+      "daylightJitterStrength": 0,
+      "nightJitterMultiplier": 0.18
+    },
+    "confidence": {
+      "min": 0.45,
+      "max": 0.95
+    }
+  },
+  "render": {
+    "dayGrid": {
+      "boxSize": 4,
+      "exportPng": true,
+      "leftMarginScale": 10,
+      "topMarginScale": 5,
+      "mirrorLegendBorder": true,
+      "edgeShiftEarlyColumns": -1,
+      "edgeShiftLateColumns": 2,
+      "edgeJitterStrength": 0,
+      "sunriseGlowIntensity": 1,
+      "sunsetGlowIntensity": 1,
+      "sunriseGlowColor": { "r": 236, "g": 178, "b": 114 },
+      "sunsetGlowColor": { "r": 244, "g": 166, "b": 96 },
+      "sunriseGlowHighlightColor": { "r": 246, "g": 224, "b": 204 },
+      "sunsetGlowHighlightColor": { "r": 252, "g": 230, "b": 208 },
+      "sunriseGrayColor": { "r": 108, "g": 114, "b": 128 },
+      "sunsetGrayColor": { "r": 84, "g": 96, "b": 118 },
+      "sunsetGrayAmount": 0.55,
+      "sunsetGrayBlueStrength": 1,
+      "sunsetAfterglowIntensity": 2.35,
+      "sunsetAfterglowCenterColumns": 4.5,
+      "sunsetAfterglowReachColumns": 4.5,
+      "sunsetAfterglowColor": { "r": 92, "g": 110, "b": 146 }
+    },
+    "spiral": {
+      "defaultPattern": "even",
+      "even": {
+        "circleRadius": 5,
+        "strokeWidth": 1,
+        "strokeColor": "#ccc",
+        "backgroundColor": "black",
+        "b": 2,
+        "maxThetaStep": 1,
+        "chord": 10
+      },
+      "vogel": {
+        "circleRadius": 5,
+        "strokeWidth": 1,
+        "strokeColor": "#ccc",
+        "backgroundColor": "black",
+        "spacingFactor": 0.9,
+        "goldenAngle": 2.399963229728653
+      }
+    }
+  }
+}

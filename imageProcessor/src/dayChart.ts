@@ -2,6 +2,8 @@
 import fs from 'fs/promises';
 import path from 'path';
 
+import { loadMergedEntries } from './data';
+
 // === Visualization Settings ===
 const CONFIG = {
   boxSize: 20,                     // size of each box in pixels
@@ -30,24 +32,35 @@ export async function dayChart(root: string) {
 
   for (const name of subdirs) {
     const folder = path.join(root, name);
+    await renderDayChartFolder(folder, CONFIG);
+  }
+}
+
+export async function dayChartFolder(folder: string) {
+  await renderDayChartFolder(folder, CONFIG);
+}
+
+async function renderDayChartFolder(folder: string, config: typeof CONFIG) {
     const stat = await fs.stat(folder).catch(() => null);
-    if (!stat || !stat.isDirectory()) continue;
+    if (!stat || !stat.isDirectory()) return;
 
     const outputPath = path.join(folder, 'output.json');
-    if (!(await fs.stat(outputPath).then(() => true).catch(() => false))) continue;
+    if (!(await fs.stat(outputPath).then(() => true).catch(() => false))) return;
 
-    // Load and parse timestamps
-    type Entry = { date: Date; average: { r: number; g: number; b: number; a?: number } };
-    const raw: { file: string; average: any }[] = JSON.parse(await fs.readFile(outputPath, 'utf-8'));
-    const entries: Entry[] = raw.map(d => {
-      const m = d.file.match(/sky_(\d{4})(\d{2})(\d{2})_(\d{2})(\d{2})/);
-      if (!m) return null;
-      const [_, yy, mo, dd, hh, mm] = m;
-      const date = new Date(+yy, +mo - 1, +dd, +hh, +mm);
-      return { date, average: d.average };
-    }).filter((e): e is Entry => !!e)
-      .sort((a, b) => a.date.getTime() - b.date.getTime());
-    if (entries.length === 0) continue;
+    const entries = await loadMergedEntries(folder);
+    if (entries.length === 0) return;
+
+    const {
+      boxSize,
+      pointsOnARow,
+      backgroundColor,
+      labelOffset,
+      intervalMinutes,
+      toleranceMinutes,
+      missingFill
+    } = config;
+    const msInterval = intervalMinutes * 60 * 1000;
+    const msTolerance = toleranceMinutes * 60 * 1000;
 
     // Determine start/end and expected count
     const first = entries[0].date;
@@ -109,5 +122,4 @@ export async function dayChart(root: string) {
     const outFile = path.join(folder, 'dayChart.svg');
     await fs.writeFile(outFile, svg.join('\n'));
     console.log(`✅ Generated ${folder}/dayChart.svg (${width}×${height})`);
-  }
 }

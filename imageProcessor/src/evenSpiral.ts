@@ -2,6 +2,8 @@
 import fs from 'fs/promises';
 import path from 'path';
 
+import { loadMergedEntries } from './data';
+
 // === Visualization Settings ===
 const CONFIG = {
   circleRadius: 5,          // radius of each circle in pixels (bead radius)
@@ -66,18 +68,28 @@ function findTheta2(b: number, theta1: number, target: number, maxStep: number):
 export async function evenSpiral(root: string) {
   console.log(`\n🔎 Generating Archimedes-bead spiral under ${root}\n`);
   const subdirs = await fs.readdir(root);
-  const { circleRadius, strokeWidth, strokeColor, backgroundColor, b, maxThetaStep, chord, enableText, enablePathStroke, pathStroke, pathStrokeWidth } = CONFIG;
 
   for (const name of subdirs) {
     const folder = path.join(root, name);
-    const stat = await fs.stat(folder).catch(() => null);
-    if (!stat?.isDirectory()) continue;
-    const outputPath = path.join(folder, 'output.json');
-    if (!(await fs.stat(outputPath).then(() => true).catch(() => false))) continue;
+    await renderEvenSpiralFolder(folder, CONFIG);
+  }
+}
 
-    const data: { file: string; average: any }[] = JSON.parse(await fs.readFile(outputPath, 'utf-8'));
+export async function evenSpiralFolder(folder: string) {
+  await renderEvenSpiralFolder(folder, CONFIG);
+}
+
+async function renderEvenSpiralFolder(folder: string, config: typeof CONFIG) {
+    const stat = await fs.stat(folder).catch(() => null);
+    if (!stat?.isDirectory()) return;
+    const outputPath = path.join(folder, 'output.json');
+    if (!(await fs.stat(outputPath).then(() => true).catch(() => false))) return;
+
+    const data = await loadMergedEntries(folder);
     const n = data.length;
-    if (n === 0) continue;
+    if (n === 0) return;
+
+    const { circleRadius, strokeWidth, strokeColor, backgroundColor, b, maxThetaStep, chord, enableText, enablePathStroke, pathStroke, pathStrokeWidth } = config;
 
     // compute coords on spiral
     const coords: { x: number; y: number }[] = [];
@@ -142,5 +154,4 @@ export async function evenSpiral(root: string) {
 
     await fs.writeFile(path.join(folder, 'evenSpiral.svg'), svg.join(''));
     console.log(`✅ Generated ${folder}/evenSpiral.svg (${size.toFixed(0)}×${size.toFixed(0)})`);
-  }
 }

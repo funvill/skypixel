@@ -1,0 +1,100 @@
+{
+  "fakeSvg": "C:\\Users\\funvill\\Documents\\git\\skypixel\\fakedata\\output\\whistler\\2025\\day-grid.svg",
+  "realSvg": "C:\\Users\\funvill\\Documents\\git\\skypixel\\images\\IEhDUXECe_k\\dayChart.svg",
+  "passed": false,
+  "checks": [
+    {
+      "name": "mean luminance",
+      "fake": 97.01817351408386,
+      "real": 112.60656146581482,
+      "tolerance": 12,
+      "passed": false
+    },
+    {
+      "name": "mean saturation",
+      "fake": 30.79152397260274,
+      "real": 29.52385683760684,
+      "tolerance": 10,
+      "passed": true
+    },
+    {
+      "name": "mean yellow bias",
+      "fake": -24.315848554033487,
+      "real": -24.098803418803417,
+      "tolerance": 8,
+      "passed": true
+    },
+    {
+      "name": "day center excess",
+      "fake": 3.6546064689658118,
+      "real": 8.864248371630163,
+      "tolerance": 8,
+      "passed": true
+    },
+    {
+      "name": "left edge width",
+      "fake": 35,
+      "real": 55,
+      "tolerance": 15,
+      "passed": false
+    },
+    {
+      "name": "right edge width",
+      "fake": 85,
+      "real": 85,
+      "tolerance": 20,
+      "passed": true
+    },
+    {
+      "name": "edge jaggedness",
+      "fake": 15.499117502662358,
+      "real": 24.288094271849417,
+      "tolerance": 5,
+      "passed": false
+    },
+    {
+      "name": "column banding",
+      "fake": 0.6087139963468395,
+      "real": 1.0921893100921913,
+      "tolerance": 3,
+      "passed": true
+    },
+    {
+      "name": "row banding",
+      "fake": 4.77090997523429,
+      "real": 6.379771960709066,
+      "tolerance": 3,
+      "passed": true
+    }
+  ],
+  "fake": {
+    "rows": 365,
+    "cols": 288,
+    "luminanceMean": 97.01817351408386,
+    "saturationMean": 30.79152397260274,
+    "yellowMean": -24.315848554033487,
+    "dayCenterExcess": 3.6546064689658118,
+    "leftEdgeWidthMinutes": 35,
+    "rightEdgeWidthMinutes": 85,
+    "edgeJaggedness": 15.499117502662358,
+    "columnBanding": 0.6087139963468395,
+    "rowBanding": 4.77090997523429
+  },
+  "real": {
+    "rows": 325,
+    "cols": 288,
+    "luminanceMean": 112.60656146581482,
+    "saturationMean": 29.52385683760684,
+    "yellowMean": -24.098803418803417,
+    "dayCenterExcess": 8.864248371630163,
+    "leftEdgeWidthMinutes": 55,
+    "rightEdgeWidthMinutes": 85,
+    "edgeJaggedness": 24.288094271849417,
+    "columnBanding": 1.0921893100921913,
+    "rowBanding": 6.379771960709066
+  },
+  "recommendations": [
+    "Sunrise or sunset transitions are too thin. Push cloud-bank gray farther into the daylight side, especially at sunset, so the edge reads thicker and less cleanly cut.",
+    "Day-night boundaries are too smooth. Increase irregular edge breakup with correlated cloud-bank style occlusion and more row-to-row edge displacement."
+  ]
+}

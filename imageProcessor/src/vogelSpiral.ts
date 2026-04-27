@@ -2,6 +2,8 @@
 import fs from 'fs/promises';
 import path from 'path';
 
+import { loadMergedEntries } from './data';
+
 // === Visualization Settings (tweak for different layouts) ===
 const CONFIG = {
   circleRadius: 5,                  // base radius of each circle in pixels
@@ -33,40 +35,48 @@ export async function vogelSpiral(root: string) {
   console.log(`\n🔎 Generating visuals under ${root}\n`);
   const subdirs = await fs.readdir(root);
 
-  const {
-    circleRadius,
-    strokeWidth,
-    strokeColor,
-    backgroundColor,
-    spacingFactor,
-    goldenAngle,
-    pathStroke,
-    pathStrokeWidth,
-    debugNumbers,
-    debugSegmentLines
-  } = CONFIG;
-
-  const diameter = circleRadius * 2;
-  const spacing = diameter * spacingFactor;
-
   for (const name of subdirs) {
     const folder = path.join(root, name);
+    await renderVogelSpiralFolder(folder, CONFIG);
+  }
+}
+
+export async function vogelSpiralFolder(folder: string) {
+  await renderVogelSpiralFolder(folder, CONFIG);
+}
+
+async function renderVogelSpiralFolder(folder: string, config: typeof CONFIG) {
     const stat = await fs.stat(folder).catch(() => null);
-    if (!stat || !stat.isDirectory()) continue;
+    if (!stat || !stat.isDirectory()) return;
 
     const outputPath = path.join(folder, 'output.json');
     const exists = await fs.stat(outputPath).then(() => true).catch(() => false);
     if (!exists) {
       console.log(`⚠️  Skipping ${folder}: output.json missing`);
-      continue;
+      return;
     }
 
-    const data: { file: string; average: any }[] =
-      JSON.parse(await fs.readFile(outputPath, 'utf-8'));
+    const data = await loadMergedEntries(folder);
     if (data.length === 0) {
       console.log(`⚠️  No data points in ${folder}`);
-      continue;
+      return;
     }
+
+    const {
+      circleRadius,
+      strokeWidth,
+      strokeColor,
+      backgroundColor,
+      spacingFactor,
+      goldenAngle,
+      pathStroke,
+      pathStrokeWidth,
+      debugNumbers,
+      debugSegmentLines
+    } = config;
+
+    const diameter = circleRadius * 2;
+    const spacing = diameter * spacingFactor;
 
     // Compute canvas size
     const n = data.length;
@@ -133,5 +143,4 @@ export async function vogelSpiral(root: string) {
     const svgPath = path.join(folder, 'VogelSpiral.svg');
     await fs.writeFile(svgPath, svgParts.join(''));
     console.log(`✅ Generated ${folder}/VogelSpiral.svg (${canvasSize.toFixed(0)}×${canvasSize.toFixed(0)})`);
-  }
 }

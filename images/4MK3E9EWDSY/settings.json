@@ -4,6 +4,9 @@
   "width": 700,
   "height": 250,
   "title": "White Rock, Canada",
+  "latitude": 49.0235357,
+  "longitude": -122.797924,
+  "timezone": "America/Vancouver",
   "link": "https://www.youtube.com/watch?v=4MK3E9EWDSY",
   "description": ""
 }
